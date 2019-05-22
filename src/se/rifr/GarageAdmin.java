@@ -1,19 +1,18 @@
 package se.rifr;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class GarageAdmin {
 
-    private Map<String, User>         userList       = new HashMap<>();
-    private Map<String, Customer> customerList       = new HashMap<>();
-    private Map<String, Account>   accountList       = new HashMap<>();
-    private Map<String, Vehicle> vehicleList         = new HashMap<>();
+    private Map<String, User> userList = new HashMap<>();
+    private Map<String, Customer> customerList = new HashMap<>();
+    private Map<String, Account> accountList = new HashMap<>();
+    private Map<String, Vehicle> vehicleList = new HashMap<>();
     private Map<String, ParkingSlot> parkingSlotList = new HashMap<>();
-    private List<Scannings> scanningList             = new ArrayList<>();
-    private List<Floor> floorList                    = new ArrayList<>();
-    private List<Garage> garageList                  = new ArrayList<>();
+    private Map<String, Garage> garageList = new HashMap<>();
+    private List<Scannings> scanningList = new ArrayList<>();
+    //private List<Floor> floorList                    = new ArrayList<>();
+    //private List<Garage> garageList                  = new ArrayList<>();
 
     String dirName = "C:\\Dev\\GarageAdmin\\";
 
@@ -22,26 +21,25 @@ public class GarageAdmin {
     String accountFile     = dirName + "accountlist.ser";
     String vehicleFile     = dirName + "vehiclelist.ser";
     String scanningFile    = dirName + "scanninglist.ser";
-    String floorFile       = dirName + "floorlist.ser";
     String garageFile      = dirName + "garagelist.ser";
     String parkingSlotFile = dirName + "parkingslotlist.ser";
 
-    
+
     public GarageAdmin() {
 
         LoadReloadData();
 
         //if (userList == null) {
-        User user = new User("Super","User","007","admin@mybank.se","SuperUser","SuperUser");
-        userList.put(user.getKey(),user);
+        User user = new User("Super", "User", "007", "admin@mybank.se", "SuperUser", "SuperUser");
+        userList.put(user.getKey(), user);
         //FileIO.writeObject(userList, userFile);
         //}
     }
 
 
-    private void LoadReloadData () {
+    private void LoadReloadData() {
 
-        try{
+        try {
             Map<String, User> tempUserList = FileIO.readObject(userFile);
             if (tempUserList != null)
                 userList = tempUserList;
@@ -59,20 +57,20 @@ public class GarageAdmin {
                 vehicleList = tempVehicleList;
 
             Map<String, ParkingSlot> tempParkingSlotList = FileIO.readObject(accountFile);
-            if (tempAccountList != null)
+            if (tempParkingSlotList != null)
                 parkingSlotList = tempParkingSlotList;
 
-            List<Scannings> tempScanningList= FileIO.readObject(scanningFile);
+            List<Scannings> tempScanningList = FileIO.readObject(scanningFile);
             if (tempScanningList != null)
                 scanningList = tempScanningList;
 
-            List<Garage> tempGarageList= FileIO.readObject(garageFile);
+            Map<String, Garage> tempGarageList= FileIO.readObject(garageFile);
             if (tempGarageList != null)
                 garageList = tempGarageList;
 
-            List<Floor> tempFloorList= FileIO.readObject(floorFile);
-            if (tempFloorList != null)
-                floorList = tempFloorList;
+            //List<Floor> tempFloorList= FileIO.readObject(floorFile);
+            //if (tempFloorList != null)
+            //    floorList = tempFloorList;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,7 +92,7 @@ public class GarageAdmin {
                 StdIO.write("Password : ");
                 String password = StdIO.readLine();
                 noLogins++;
-                if (loginOk(userName,password)) {
+                if (loginOk(userName, password)) {
                     return true;
                 }
             }
@@ -119,95 +117,129 @@ public class GarageAdmin {
 
         String answer = "";
         do {
-            answer =menu();
-            try{
-            switch (answer) {
-                case "0":
-                    LoadReloadData();
-                    break;
-                case "1":
-                    maintainCustomer();
-                    break;
-                case "2":
-                    listCustomers();
-                    break;
-                case "3":
-                    scanTransaction();
-                    break;
-                case "4":
-                    listScannings();
-                    break;
-                case "5":
-                    maintainUsers();
-                    break;
-                case "6":
-                    listUsers();
-                    break;
-                case "7":
-                    maintainAccounts();
-                    break;
-                case "8":
-                    listAccounts();
-                    break;
-                case "9":
-                    maintainGarage();
-                    break;
-                case "10":
-                    listGarage();
-                    break;
-                case "11":
-                    maintainFloors();
-                    break;
-                case "12":
-                    listFloors();
-                    break;
-                case "13":
-                    maintainParkingSlots();
-                    break;
-                case "14":
-                    listParkingSlots();
-                    break;
-                case "15":
-                    copyCustomerDataToUser();
-                    break;
-                case "16":
-                    deleteUser();
-                    break;
-                case "17":
-                    excludeOrOpeVehicle(true);
-                    break;
-                case "18":
-                    excludeOrOpeVehicle(false);
-                    break;
-                case "88":
+            answer = menu();
+            try {
+                switch (answer) {
+                    case "0":
+                        LoadReloadData();
+                        break;
+                    case "1":
+                        maintainCustomer();
+                        break;
+                    case "2":
+                        listCustomers();
+                        break;
+                    case "3":
+                        maintainUsers();
+                        break;
+                    case "4":
+                        listUsers();
+                        break;
+                    case "5":
+                        maintainAccounts();
+                        break;
+                    case "6":
+                        listAccounts();
+                        break;
+                    case "7":
+                        copyCustomerDataToUser();
+                        break;
+                    case "8":
+                        deleteUser();
+                        break;
+                    case "9":
+                        maintainVehicles();
+                        break;
+                    case "10":
+                        listVehicles();
+                        break;
+                    case "12":
+                        createGarage();
+                        break;
+                    case "13":
+                        listGarage();
+                        break;
+                    case "14":
+                        maintainParkingSlots();
+                        break;
+                    case "15":
+                        listParkingSlots();
+                        break;
+                    case "16":
+                        scanParking();
+                        break;
+                    case "17":
+                        listParkings();
+                        break;
+                    //case "17":
+                    //    excludeOrOpeVehicle(true);
+                    //    break;
+                    //case "18":
+                    //    excludeOrOpeVehicle(false);
+                    //    break;
+                    case "80":
 
-                    Customer customer = new Customer("Kalle", "Anka", "189901011111", "kalle.anka@ankeborg.com", "KALLEANKA");
-                    customerList.put(customer.getKey(),customer);
+                        Mc    myMc    = new Mc   ("ABC000",customerList.get("189901011111"));
+                        System.out.println(myMc +" "+ countNoOfFreeSlots(garageList.get("DROTTNINGGATAN 8"),myMc.getSize()));
 
-                    User user = new User(customer.getFirstName(),customer.getLastName(),customer.getBarCode(),customer.getEmail(),customer.getUserName(),"KalleAnkaÄrBäst");
-                    userList.put(user.getKey(),user);
+                        Car   myCar   = new Car  ("ABC111",customerList.get("189901011111"));
+                        System.out.println(myCar +" "+ countNoOfFreeSlots(garageList.get("DROTTNINGGATAN 8"),myCar.getSize()));
 
-                    Account account = new Account(customer, "12345678901234567890", 50000.0, "Kalles head account");
-                    accountList.put(account.getKey(), account);
+                        Truck myTruck = new Truck("ABC222",customerList.get("189901011111"));
+                        System.out.println(myTruck +" "+ countNoOfFreeSlots(garageList.get("DROTTNINGGATAN 8"),myTruck.getSize()));
 
-                    break;
-                case "70":
-                    System.out.println(registerTransaction(getAtmHw("AtmTest001"),getAccount("000000000000001"), false, 500.0));
-                    break;
-                case "71":
-                    System.out.println(registerTransaction(getAtmHw("AtmTest001"),getAccount("000000000000001"), true, 2000.0));
-                    break;
-                case "99":
-                    listUsers(); System.out.println("");
-                    listAccounts();System.out.println("");
-                    listCustomers();System.out.println("");
-                    listVehicles();System.out.println("");
-                    listScannings();System.out.println("");
-                    listGarages();System.out.println("");
-                    listFloors();System.out.println("");
-                    listParkingSlots();System.out.println("");
-                    break;
-            }
+                        ArticulatedLorry myLorry =
+                                new ArticulatedLorry("ABC333",customerList.get("189901011111"),2);
+                        System.out.println(myLorry +" "+ countNoOfFreeSlots(garageList.get("DROTTNINGGATAN 8"),myLorry.getSize()));
+
+                        break;
+                    case "88":
+
+                        Customer customer = new Customer("Kalle", "Anka", "189901011111", "kalle.anka@ankeborg.com", "KALLEANKA");
+                        customerList.put(customer.getKey(), customer);
+
+                        User user = new User(customer.getFirstName(), customer.getLastName(), customer.getBarCode(), customer.getEmail(), customer.getUserName(), "KalleAnkaÄrBäst");
+                        userList.put(user.getKey(), user);
+
+                        Account account = new Account(customer, "12345678901234567890", 0.0, "Kalles head account");
+                        accountList.put(account.getKey(), account);
+
+                        Garage garage = new Garage ("DROTTNINGGATAN 8","Litet garage");
+                        garageList.put(garage.getKey(), garage);
+                        Floor floor = new Floor(1,"1 bil plats plus två mc platser");
+                        ParkingSlot slotCar1 = new ParkingSlot (garage,floor,1,Vehicle.Size.MEDIUM);
+                        parkingSlotList.put(slotCar1.getKey(),slotCar1);
+
+                        ParkingSlot slotMc1  = new ParkingSlot (garage,floor,1,Vehicle.Size.SMALL);
+                        parkingSlotList.put(slotMc1.getKey(),slotMc1);
+
+                        ParkingSlot slotMc2  = new ParkingSlot (garage,floor,1,Vehicle.Size.SMALL);
+                        parkingSlotList.put(slotMc2.getKey(),slotMc2);
+
+                        break;
+                    //case "70":
+                    //    System.out.println(registerTransaction(getAtmHw("AtmTest001"),getAccount("000000000000001"), false, 500.0));
+                    //    break;
+                    //case "71":
+                    //    System.out.println(registerTransaction(getAtmHw("AtmTest001"),getAccount("000000000000001"), true, 2000.0));
+                    //    break;
+                    case "99":
+                        listUsers();
+                        System.out.println("");
+                        listAccounts();
+                        System.out.println("");
+                        listCustomers();
+                        System.out.println("");
+                        listVehicles();
+                        System.out.println("");
+                        listParkings();
+                        System.out.println("");
+                        listGarages();System.out.println("");
+                        //listFloors();System.out.println("");
+                        listParkingSlots();
+                        System.out.println("");
+                        break;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 StdIO.ErrorReport("Exception -" + e.toString());
@@ -219,13 +251,13 @@ public class GarageAdmin {
         if (customerList != null)
             FileIO.writeObject(customerList, customerFile);
         if (scanningList != null)
-            FileIO.writeObject(scanningList, transactionFile);
+            FileIO.writeObject(scanningList, scanningFile);
         if (userList != null)
             FileIO.writeObject(userList, userFile);
-        if (cardList != null)
-            FileIO.writeObject(cardList,cardFile);
-        if (atmHwList != null)
-            FileIO.writeObject(atmHwList,atmHwFile);
+        if (parkingSlotList != null)
+            FileIO.writeObject(parkingSlotList, parkingSlotFile);
+        //if (atmHwList != null)
+        //    FileIO.writeObject(atmHwList,atmHwFile);
     }
 
     private String menu() {
@@ -239,20 +271,20 @@ public class GarageAdmin {
             StdIO.writeLine(" 0. Reload");
             StdIO.writeLine(" 1. Maintain Customer");
             StdIO.writeLine(" 2. List Customer");
-            StdIO.writeLine(" 3. Scan Transaction");
-            StdIO.writeLine(" 4. List Scannings");
-            StdIO.writeLine(" 5. Maintain users");
-            StdIO.writeLine(" 6. List users");
-            StdIO.writeLine(" 7. Maintain Accounts");
-            StdIO.writeLine(" 8. List Accounts");
-            StdIO.writeLine(" 9. Create user from customer");
-            StdIO.writeLine("10. Maintain cards");
-            StdIO.writeLine("11. List cards");
-            StdIO.writeLine("12. Maintain ATM machines");
-            StdIO.writeLine("13. List ATM machines");
-            StdIO.writeLine("14. Delete user");
-            StdIO.writeLine("15. Exclude Card ");
-            StdIO.writeLine("16. Open Card ");
+            StdIO.writeLine(" 3. Maintain users");
+            StdIO.writeLine(" 4. List users");
+            StdIO.writeLine(" 5. Maintain Accounts");
+            StdIO.writeLine(" 6. List Accounts");
+            StdIO.writeLine(" 7. Create user from customer");
+            StdIO.writeLine(" 8. Delete user");
+            StdIO.writeLine(" 9. Maintain Vehicles ");
+            StdIO.writeLine("10. List Vehicles");
+            StdIO.writeLine("11. Create Garage");
+            StdIO.writeLine("12. List Garage");
+            StdIO.writeLine("13. Maintain Parkingslots ");
+            StdIO.writeLine("14. List Parkingslots ");
+            StdIO.writeLine("15. Scan Parking ");
+            StdIO.writeLine("16. List Parking");
             StdIO.writeLine("");
             StdIO.writeLine("q. Exit");
             StdIO.writeLine("");
@@ -266,133 +298,17 @@ public class GarageAdmin {
         }
     }
 
-    private void scanTransaction() {
-        Card card;
+    private void scanParking() {
+        Vehicle vehicle;
         try {
             StdIO.clearScreen();
-            StdIO.writeLine("Scan Transaction");
+            StdIO.writeLine("Scan Parking");
 
-            StdIO.write("AtmHw ID      : ");
-            String atmHwId = StdIO.readLine();
-            if (!atmHwList.containsKey(atmHwId)){
-                StdIO.ErrorReport("Unknown ATM mashine "+atmHwId);
-                return;
-            }
-
-            if (!atmMachineOk(atmHwId)){
-                StdIO.ErrorReport("ATM mashine HW problem: "+atmHwId + " "+atmHwList.get(atmHwId).getHwErrorCode());
-                return;
-            }
-
-            StdIO.write("Card ID       : ");
-            String cardId = StdIO.readLine();
-            if (!cardList.containsKey(cardId)){
-                StdIO.ErrorReport("Unknown Card " +cardId);
-                return;
-            }
-            card = cardList.get(cardId);
-
-            if (!Str.readAcceptedValue("Pin code      : ",card.getPinCode(),3)){
-                StdIO.ErrorReport("Unknown Pin Code, max number of tries reached ");
-                return;
-            };
-
-            if (!cardOk(card.getCardId())) {
-                StdIO.ErrorReport("The card is not accepted ");
-                return;
-            }
-
-            StdIO.write("Deposit (y/n) : ");
-            boolean deposit = StdIO.readYesOrNo();
-
-            StdIO.write("Amount        : ");
-            double amount = Double.valueOf(StdIO.readLine());
-
-            if (!atmMachinSaldoOk(atmHwId,deposit,amount)) {
-                StdIO.ErrorReport("The ATM HW rejected your request ");
-                return;
-            }
-
-            String res = registerFullTransaction(atmHwId,cardId,deposit,amount);
-            System.out.println(res);
 
         } catch (Exception e) {
             e.printStackTrace();
             StdIO.ErrorReport("Exception -" + e.toString());
         }
-    }
-
-    public String registerFullTransaction(String atmHwId, String CardId, boolean deposit, double amount) {
-
-        AtmHw   atmhw   = atmHwList.get(atmHwId);
-        Card    card    = cardList.get(CardId);
-        Account account = accountList.get(card.getAccount().getAccountId());
-
-        if (!atmMachineOk(atmhw)) return "";
-        if (!atmMachinSaldoOk(atmhw,deposit,amount)) return "";
-        if (!cardOk(card)) return "";
-        if (!cardSaldoOk(card,amount)) return "";
-
-
-        String res = registerTransaction(atmhw, account,deposit,amount);
-        if (res.isEmpty()) return "";
-        else {
-            card.setAccount(account);
-            cardList.put(card.getKey(),card);
-            FileIO.writeObject(cardList, cardFile);
-
-            registerAtmTransaction(atmhw,deposit,amount);
-
-        }
-
-        return res;
-    }
-
-    public void registerAtmTransaction(AtmHw atmHw, boolean deposit, double amount) {
-
-        try {
-            atmHw.changeSaldo(amount,deposit);
-            atmHwList.put(atmHw.getKey(),atmHw);
-            FileIO.writeObject(atmHwList, atmHwFile);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            StdIO.ErrorReport("Exception -" + e.toString());
-       }
-    }
-
-    public String registerTransaction(AtmHw atmHw, Account account, boolean deposit, double amount) {
-
-        String returnStr = "";
-        try {
-
-            if (!(deposit && account.getSaldo() < amount)) {
-
-                Scannings scannings = new Scannings(account, LocalDateTime.now(), deposit,amount,atmHw);
-
-                scanningList.add(scannings);
-                FileIO.writeObject(scanningList, transactionFile);
-
-                System.out.println("Before " +account.getSaldo() +" "+ deposit);
-                account.changeSaldo(amount,deposit);
-                System.out.println("After " +account.getSaldo() +" amount"+ amount);
-
-                returnStr = account.getCustomer().getFullName() + " current saldo " +account.getSaldo();
-
-                accountList.put(account.getKey(),account);
-                FileIO.writeObject(accountList, accountFile);
-
-                return returnStr;
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            StdIO.ErrorReport("Exception -" + e.toString());
-            return "EXCEPTION: " +e;
-        }
-
-        return returnStr;
     }
 
     //private String TransactionToString (Scannings trans) {
@@ -400,8 +316,8 @@ public class GarageAdmin {
     //}
     public String listAllTransactions() {
         String str = "";
-        for (Scannings x : scanningList){
-            str += x.toString() +"\r\n";
+        for (Scannings x : scanningList) {
+            str += x.toString() + "\r\n";
         }
         return str;
     }
@@ -409,8 +325,9 @@ public class GarageAdmin {
     private void listCustomers() {
         System.out.println(Customer.toStringHeader());
         if (customerList != null)
-            customerList.forEach((k,v) -> System.out.println(v.toStringLine()));
+            customerList.forEach((k, v) -> System.out.println(v.toStringLine()));
     }
+
     private void maintainCustomer() {
         try {
             StdIO.clearScreen();
@@ -436,7 +353,7 @@ public class GarageAdmin {
 
             FileIO.writeObject(customerList, customerFile);
 
-            updateAccountdWithUpdatedCustomer (customer); // update if exists in accounts
+            updateAccountdWithUpdatedCustomer(customer); // update if exists in accounts
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -444,31 +361,19 @@ public class GarageAdmin {
         }
     }
 
-    private void updateAccountdWithUpdatedCustomer (Customer customer) {
+    private void updateAccountdWithUpdatedCustomer(Customer customer) {
         for (Account x : accountList.values()) {
-            if (x.getCustomer().getKey() == customer.getKey()){
+            if (x.getCustomer().getKey() == customer.getKey()) {
 
                 x.setCustomer(customer);
-                accountList.put(x.getKey(),x);
+                accountList.put(x.getKey(), x);
 
-                updateCardWithUpdatedAccount(x);
             }
         }
         FileIO.writeObject(accountList, accountFile);
     }
 
-    private void updateCardWithUpdatedAccount (Account account) {
-        for (Card x : cardList.values()) {
-            if (x.getKey() == account.getKey()){
-
-                x.setAccount(account);
-                cardList.put(x.getKey(),x);
-            }
-        }
-        FileIO.writeObject(cardList, cardFile);
-    }
-
-    private void listScannings() {
+    private void listParkings() {
         System.out.println(Scannings.toStringHeader());
         if (scanningList != null)
             scanningList.stream().forEach(item -> System.out.println(item.toStringLine()));
@@ -477,7 +382,7 @@ public class GarageAdmin {
     private void listUsers() {
         System.out.println(User.toStringHeader());
         if (userList != null)
-            userList.forEach((k,v) -> System.out.println(v.toStringLine()));
+            userList.forEach((k, v) -> System.out.println(v.toStringLine()));
     }
 
     private void maintainUsers() {
@@ -499,11 +404,11 @@ public class GarageAdmin {
             String userName = StdIO.readLine();
             StdIO.write("Password  : ");
             String password = StdIO.readLine();
-            User user = new User(firstName,lastName,barcode,email,userName,password);
+            User user = new User(firstName, lastName, barcode, email, userName, password);
 
-            userList.put(user.getKey(),user);
+            userList.put(user.getKey(), user);
 
-            FileIO.writeObject(userList,userFile);
+            FileIO.writeObject(userList, userFile);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -511,7 +416,7 @@ public class GarageAdmin {
         }
     }
 
-    private void copyCustomerDataToUser () {
+    private void copyCustomerDataToUser() {
 
         try {
 
@@ -522,32 +427,33 @@ public class GarageAdmin {
             if (customerList.containsKey(barcode))
                 customer = customerList.get(barcode);
             else {
-                StdIO.ErrorReport("Unknown Customer " +barcode);
+                StdIO.ErrorReport("Unknown Customer " + barcode);
                 return;
             }
 
             String userName = customer.getUserName();
-            while (userList.containsKey(userName)){
+            while (userList.containsKey(userName)) {
                 StdIO.ErrorReport("User Name " + customer.getUserName() + " already exists, enter new");
                 userName = StdIO.readLine().trim();
             }
 
             customer.setUserName(userName);
-            customerList.put(customer.getKey(),customer);
-            FileIO.writeObject(customerList,customerFile);
+            customerList.put(customer.getKey(), customer);
+            FileIO.writeObject(customerList, customerFile);
 
             StdIO.write("Password   : ");
             String password = StdIO.readLine().trim();
 
-            User user = new User(customer.getFirstName(),customer.getLastName(),customer.getBarCode(),customer.getEmail(),userName,password);
-            userList.put(user.getKey(),user);
-            FileIO.writeObject(userList,userFile);
+            User user = new User(customer.getFirstName(), customer.getLastName(), customer.getBarCode(), customer.getEmail(), userName, password);
+            userList.put(user.getKey(), user);
+            FileIO.writeObject(userList, userFile);
 
         } catch (Exception e) {
             e.printStackTrace();
             StdIO.ErrorReport("Exception -" + e.toString());
         }
     }
+
     private void deleteUser() {
         try {
             StdIO.write("User Name : ");
@@ -555,10 +461,10 @@ public class GarageAdmin {
             if (userList.containsKey(userName)) {
                 User user = userList.get(userName);
                 StdIO.writeLine("Confirm deletion for "
-                        +user.getFirstName()+" " +user.getLastName() + " "+user.getBarcode()+ "(y/n)");
+                        + user.getFirstName() + " " + user.getLastName() + " " + user.getBarcode() + "(y/n)");
                 if (StdIO.readYesOrNo()) {
                     userList.remove(userName);
-                    FileIO.writeObject(userList,userFile);
+                    FileIO.writeObject(userList, userFile);
                 }
             } else
                 StdIO.ErrorReport("Unknown User Name");
@@ -573,8 +479,8 @@ public class GarageAdmin {
     private void listAccounts() {
         System.out.println(Account.toStringHeader());
         if (accountList != null)
-            accountList.forEach((k,v) -> System.out.println(v.toStringLine()));
-     }
+            accountList.forEach((k, v) -> System.out.println(v.toStringLine()));
+    }
 
     private void maintainAccounts() {
         Account account;
@@ -593,7 +499,7 @@ public class GarageAdmin {
             if (customerList.containsKey(barcode))
                 customer = customerList.get(barcode);
             else {
-                System.out.println("Unknown customer " +barcode);
+                System.out.println("Unknown customer " + barcode);
                 return;
             }
 
@@ -629,67 +535,58 @@ public class GarageAdmin {
         }
     }
 
-    private void listFloors() {
-        System.out.println(Card.toStringHeader());
-        if (cardList != null)
-            cardList.forEach((k,v) -> System.out.println(v.toStringLine()));
+    private void listVehicles() {
+        System.out.println(Vehicle.toStringHeader());
+        if (vehicleList != null)
+            for (Vehicle x : vehicleList.values() )
+                System.out.println(x.toStringLine());
+            //vehicleList.forEach((k, v) -> System.out.println(v.toStringLine()));
     }
 
-    private void maintainCards() {
+    private void maintainVehicles() {
+        Vehicle vehicle;
+        double saldo;
         try {
+            Customer customer;
+
             StdIO.clearScreen();
 
             StdIO.writeLine("");
-            StdIO.writeLine("Maintain Cards");
+            StdIO.writeLine("Add a Vehicle");
+
             StdIO.writeLine("");
-            StdIO.write("Card Id     : ");
-            String cardId = StdIO.readLine();
-            StdIO.write("Pincode     : ");
-            String pincode = StdIO.readLine();
+            StdIO.writeLine("Customer barcode");
+            String barcode = StdIO.readLine();
+            if (customerList.containsKey(barcode))
+                customer = customerList.get(barcode);
+            else {
+                System.out.println("Unknown customer " + barcode);
+                return;
+            }
 
-            LocalDate validThrou = LocalDateTime.now().plusYears(5).toLocalDate();
-            StdIO.writeLine("ValidThrou "+validThrou.toString());
+            StdIO.writeLine("");
+            StdIO.write("Registration Number : ");
+            String regNo = StdIO.readLine().trim();
 
-            StdIO.write("Account Id  : ");
-            String accountID = StdIO.readLine().trim();
+            StdIO.write("Needs size (SMALL,MEDIUM,LARGE,HUGE): ");
+            Vehicle.Size size = Vehicle.Size.valueOf(StdIO.readLine().toUpperCase());
 
-            StdIO.write("Max per week: ");
-            String maxPerWeek = StdIO.readLine().trim();
+            if (vehicleList.containsKey(regNo)) {
+                vehicle = vehicleList.get(regNo);
+                if (vehicle.getCustomer().getBarCode() != customer.getBarCode()) {
+                    StdIO.ErrorReport("The customer can not be changed");
+                    return;
+                } else
+                    vehicle.setCustomer(customer);
 
-            if (accountList.containsKey(accountID)) {
-                Card card = new Card(cardId,pincode,validThrou,accountList.get(accountID),Double.valueOf(maxPerWeek));
-
-                cardList.put(card.getKey(),card);
-
-                FileIO.writeObject(cardList,cardFile);
             } else {
-                StdIO.ErrorReport("Unknown Account Id " +accountID);
-                return;
+
+                vehicle = new Vehicle(regNo, size, customer);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            StdIO.ErrorReport("Exception -" + e.toString());
-        }
-    }
+            vehicleList.put(vehicle.getKey(), vehicle);
 
-    private void excludeOrOpenCard (boolean exclude) {
-
-        try {
-            StdIO.write("Card Id     : ");
-            String cardId = StdIO.readLine();
-
-            if (!cardList.containsKey(cardId)) {
-                StdIO.ErrorReport("Unknown Card " +cardId);
-                return;
-            }
-
-            Card card = cardList.get(cardId);
-
-            card.setWithDrawn(exclude);
-            cardList.put(card.getKey(),card);
-
-            FileIO.writeObject(cardList,cardFile);
+            FileIO.writeObject(vehicleList, vehicleFile);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -698,38 +595,135 @@ public class GarageAdmin {
     }
 
     private void listParkingSlots() {
-        System.out.println(AtmHw.toStringHeader());
-        if (atmHwList != null)
-            atmHwList.forEach((k,v) -> System.out.println(v.toStringLine()));
+        System.out.println(ParkingSlot.toStringHeader());
+        if (parkingSlotList != null)
+            parkingSlotList.forEach((k, v) -> System.out.println(v.toStringLine()));
     }
 
-    private void maintainAtmMachines() {
+    private int countNoOfFreeSlots (Garage garage, Vehicle.Size withSize) {
+        int noOfItems = 0;
+
+        for (ParkingSlot x : parkingSlotList.values())
+            if (garage.getKey().equals(x.getGarage().getKey()) && x.isFree() && x.getSize() == withSize ) {
+                noOfItems++;
+            }
+
+        return noOfItems;
+    }
+
+    private ParkingSlot getNextFree (Garage garage, Vehicle.Size withSize) {
+
+        for (ParkingSlot x : parkingSlotList.values()) {
+            if (garage.getKey().equals(x.getGarage().getKey()) && x.isFree() && x.getSize() == withSize) {
+                return x;
+            }
+        }
+
+        throw new IllegalCallerException("Full, no free slot exists with the requeste size");
+    }
+
+    private void listFilteredItem(String name, ParkingSlot v) {
+        if (name.equalsIgnoreCase(v.getGarage().getName()))
+            System.out.println(v.toStringLine());
+    }
+
+    private void listGarage(Garage garage) {
+
+        System.out.println(garage.getName() + " "+ garage.getDescription());
+        System.out.println();
+        System.out.println(ParkingSlot.toStringHeader());
+        if (parkingSlotList != null)
+            parkingSlotList.forEach((k, v) -> listFilteredItem(garage.getName(), v));
+    }
+
+    private void listGarage() {
         try {
-            StdIO.clearScreen();
+            StdIO.write("Name       : ");
+            String name = StdIO.readLine();
 
-            StdIO.writeLine("");
-            StdIO.writeLine("Maintain an ATM mashine");
-            StdIO.writeLine("");
-            StdIO.write("MachineId       : ");
-            String mashineId = StdIO.readLine();
-            StdIO.write("Saldo           : ");
-            String saldo = StdIO.readLine();
-            StdIO.write("Description     : ");
-            String description = StdIO.readLine();
-            StdIO.write("HwErrorCode     : ");
-            String hwErrorCode = StdIO.readLine();
-            StdIO.write("Max withdraw    : ");
-            String maxWithdraw = StdIO.readLine();
-
-            AtmHw atmHw = new AtmHw(mashineId,Double.valueOf(saldo),description,hwErrorCode,Double.valueOf(maxWithdraw));
-
-            atmHwList.put(atmHw.getKey(),atmHw);
-
-            FileIO.writeObject(atmHwList,atmHwFile);
+            listGarage(garageList.get(name));
 
         } catch (Exception e) {
             e.printStackTrace();
             StdIO.ErrorReport("Exception -" + e.toString());
         }
+    }
+
+    private void listGarages() {
+        for (Garage x : garageList.values()) {
+            listGarage (x);
+            System.out.println();
+        }
+    }
+
+    private void createGarage() {
+        try {
+            StdIO.clearScreen();
+
+            StdIO.writeLine("");
+            StdIO.writeLine("Create Garage");
+            StdIO.writeLine("");
+            StdIO.write("Name       : ");
+            String name = StdIO.readLine();
+            StdIO.write("Description     : ");
+            String description = StdIO.readLine();
+
+            Garage garage = new Garage(name, description);
+
+            garageList.put(garage.getKey(),garage);
+            FileIO.writeObject(garageList, garageFile);
+
+            StdIO.write("No Of Floors    : ");
+            int noOfFloors = Integer.valueOf(StdIO.readLine());
+
+            for (int i = 0; i < noOfFloors; i++) {
+                StdIO.write(i + " Floor Description: ");
+                description = StdIO.readLine();
+
+                Floor floor = new Floor(i, description);
+
+                StdIO.write("No Of Parking slots on the floor : ");
+                int noOfSlots = Integer.valueOf(StdIO.readLine());
+
+                StdIO.write("Size of the slots (SMALL,MEDIUM,LARGE,HUGE) : ");
+                Vehicle.Size slotSize = Vehicle.Size.valueOf(StdIO.readLine().toUpperCase());
+
+                for (int j = 0; j < noOfSlots; j++) {
+
+                    ParkingSlot parkingSlot = new ParkingSlot(garage, floor, i, slotSize);
+
+                    parkingSlotList.put(parkingSlot.getKey(), parkingSlot);
+                }
+            }
+
+            FileIO.writeObject(parkingSlotList, parkingSlotFile);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            StdIO.ErrorReport("Exception -" + e.toString());
+        }
+    }
+
+    private void maintainParkingSlots() {
+        try {
+            StdIO.clearScreen();
+
+            StdIO.writeLine("");
+            StdIO.writeLine("Maintain i Parking Slot");
+            StdIO.writeLine("");
+            StdIO.write("Garage Name : ");
+            String name = StdIO.readLine();
+
+            StdIO.write("Floor : ");
+            int floorIx = Integer.valueOf(StdIO.readLine());
+
+            StdIO.write("Slot : ");
+            int slotIx = Integer.valueOf(StdIO.readLine());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            StdIO.ErrorReport("Exception -" + e.toString());
+        }
+
     }
 }

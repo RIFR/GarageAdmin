@@ -28,7 +28,7 @@ public class Scannings implements java.io.Serializable{
 
     @Override
     public String toString() {
-        return Str.padRight(vehicle.getRegistrationNumber(),30) +
+        return Str.padRight(vehicle.getBarcode(),30) +
               time.toLocalTime().toString().substring(0,8) + " " +
                 (entered ? "ENTERED   ":"LEAVING ");
     }
@@ -44,7 +44,7 @@ public class Scannings implements java.io.Serializable{
 
     public String toStringLine() {
         String returnString;
-        returnString  = Str.padRight(getVehicle().getRegistrationNumber(),16);
+        returnString  = Str.padRight(getVehicle().getBarcode(),16);
         returnString += Str.padRight(getTime().toString().substring(0,19),16);
         returnString += Str.padRight((isEntered() ? "ENTERED":"LEAVING"),14);
         return returnString;

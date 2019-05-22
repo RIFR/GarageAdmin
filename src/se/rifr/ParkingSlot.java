@@ -1,17 +1,18 @@
 package se.rifr;
 
-public class ParkingSlot {
+public class ParkingSlot implements java.io.Serializable {
 
-    Garage  garage;
-    Floor   floor;
-    int     placeNo;
-    Vehicle reservedFor;
-    Vehicle parked;
+    Garage       garage;
+    Floor        floor;
+    int          placeNo;
+    Vehicle.Size size;
+    Vehicle      parked = null;
 
-    public ParkingSlot(Garage garage, Floor floor, int placeNo) {
+    public ParkingSlot(Garage garage, Floor floor, int placeNo, Vehicle.Size size) {
         this.garage = garage;
         this.floor = floor;
         this.placeNo = placeNo;
+        this.size = size;
     }
 
     public String getKey() {
@@ -42,14 +43,6 @@ public class ParkingSlot {
         this.placeNo = placeNo;
     }
 
-    public Vehicle getReservedFor() {
-        return reservedFor;
-    }
-
-    public void setReservedFor(Vehicle reservedFor) {
-        this.reservedFor = reservedFor;
-    }
-
     public Vehicle getParked() {
         return parked;
     }
@@ -57,4 +50,54 @@ public class ParkingSlot {
     public void setParked(Vehicle parked) {
         this.parked = parked;
     }
+
+    public Vehicle.Size getSize() {
+        return size;
+    }
+
+    public void setSize(Vehicle.Size size) {
+        this.size = size;
+    }
+
+    public void free() {
+        this.parked = null;
+    }
+
+    public boolean isFree() {
+        return (this.parked == null);
+    }
+
+    @Override
+    public String toString() {
+        String returnString;
+        returnString = "Garage{Name=" + Str.padRight(getGarage().getName(),30);
+        returnString += ", Floor='" +  Str.padRight(Integer.toString(getFloor().getLevel()),5);
+        returnString += ", Index='" +  Str.padRight(Integer.toString(getPlaceNo()),5);
+        if (this.parked != null)
+            returnString += ", Vehicle='" +  Str.padRight(getParked().getBarcode(),20);
+        returnString += '}';
+        return returnString;
+    }
+
+    public static String toStringHeader() {
+        String returnString;
+        returnString  = Str.padRight("Name",30);
+        returnString += Str.padRight("Floor",5);
+        returnString += Str.padRight("Index",5);
+        returnString += Str.padRight("Parked",20);
+        returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
+        return returnString;
+    }
+
+    public String toStringLine() {
+        String returnString;
+        returnString  = Str.padRight(getGarage().getName(),30);
+        returnString += Str.padRight(Integer.toString(getFloor().getLevel()),5);
+        returnString += Str.padRight(Integer.toString(getPlaceNo()),5);
+        if (this.parked != null)
+            returnString += Str.padRight(getParked().getBarcode(),20);
+
+        return returnString;
+    }
+
 }

@@ -1,6 +1,6 @@
 package se.rifr;
 
-public class Garage implements java.io.Serializable {
+public class Garage implements java.io.Serializable{
 
     String name;
     String description;
@@ -10,7 +10,7 @@ public class Garage implements java.io.Serializable {
         this.description = description;
     }
 
-    public String getKay() {
+    public String getKey() {
         return name;
     }
 
