@@ -18,7 +18,7 @@ public class Scannings implements java.io.Serializable{
         return vehicle;
     }
 
-     public LocalDateTime getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 

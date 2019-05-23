@@ -2,8 +2,8 @@ package se.rifr;
 
 public class Garage implements java.io.Serializable{
 
-    String name;
-    String description;
+    private String name;
+    private String description;
 
     public Garage(String name, String description) {
         this.name = name;

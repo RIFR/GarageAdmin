@@ -1,8 +1,8 @@
 package se.rifr;
 public class Floor implements java.io.Serializable {
 
-    int    level;
-    String Description;
+    private int    level;
+    private String Description;
 
     public Floor(int level, String description) {
         this.level = level;

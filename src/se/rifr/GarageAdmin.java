@@ -14,15 +14,15 @@ public class GarageAdmin {
     //private List<Floor> floorList                    = new ArrayList<>();
     //private List<Garage> garageList                  = new ArrayList<>();
 
-    String dirName = "C:\\Dev\\GarageAdmin\\";
+    private String dirName = "C:\\Dev\\GarageAdmin\\";
 
-    String userFile        = dirName + "userlist.ser";
-    String customerFile    = dirName + "customerlist.ser";
-    String accountFile     = dirName + "accountlist.ser";
-    String vehicleFile     = dirName + "vehiclelist.ser";
-    String scanningFile    = dirName + "scanninglist.ser";
-    String garageFile      = dirName + "garagelist.ser";
-    String parkingSlotFile = dirName + "parkingslotlist.ser";
+    private String userFile        = dirName + "userlist.ser";
+    private String customerFile    = dirName + "customerlist.ser";
+    private String accountFile     = dirName + "accountlist.ser";
+    private String vehicleFile     = dirName + "vehiclelist.ser";
+    private String scanningFile    = dirName + "scanninglist.ser";
+    private String garageFile      = dirName + "garagelist.ser";
+    private String parkingSlotFile = dirName + "parkingslotlist.ser";
 
 
     public GarageAdmin() {
@@ -52,11 +52,11 @@ public class GarageAdmin {
             if (tempAccountList != null)
                 accountList = tempAccountList;
 
-            Map<String, Vehicle> tempVehicleList = FileIO.readObject(accountFile);
+            Map<String, Vehicle> tempVehicleList = FileIO.readObject(vehicleFile);
             if (tempVehicleList != null)
                 vehicleList = tempVehicleList;
 
-            Map<String, ParkingSlot> tempParkingSlotList = FileIO.readObject(accountFile);
+            Map<String, ParkingSlot> tempParkingSlotList = FileIO.readObject(parkingSlotFile);
             if (tempParkingSlotList != null)
                 parkingSlotList = tempParkingSlotList;
 
@@ -109,7 +109,6 @@ public class GarageAdmin {
     public boolean loginOk(String username, String password) {
         return (userList.containsKey(username) && userList.get(username).getPassword().equals(password));
     }
-
 
     public void start() {
 
@@ -169,7 +168,7 @@ public class GarageAdmin {
                         scanParking();
                         break;
                     case "17":
-                        listParkings();
+                        listScannings();
                         break;
                     //case "17":
                     //    excludeOrOpeVehicle(true);
@@ -179,18 +178,67 @@ public class GarageAdmin {
                     //    break;
                     case "80":
 
-                        Mc    myMc    = new Mc   ("ABC000",customerList.get("189901011111"));
-                        System.out.println(myMc +" "+ countNoOfFreeSlots(garageList.get("DROTTNINGGATAN 8"),myMc.getSize()));
+                        System.out.print("Garage name? ");
+                        Garage myGarage = garageList.get(StdIO.readLine());
 
-                        Car   myCar   = new Car  ("ABC111",customerList.get("189901011111"));
-                        System.out.println(myCar +" "+ countNoOfFreeSlots(garageList.get("DROTTNINGGATAN 8"),myCar.getSize()));
+                        System.out.println("No of free slots "+countAllFreeSlots (myGarage));
 
-                        Truck myTruck = new Truck("ABC222",customerList.get("189901011111"));
-                        System.out.println(myTruck +" "+ countNoOfFreeSlots(garageList.get("DROTTNINGGATAN 8"),myTruck.getSize()));
+                        System.out.print("Reg Nos (3 char)");
+                        String regNoP0 = StdIO.readLine();
+
+                        ParkingSlot slot;
+
+                        Mc    myMc    = new Mc   (regNoP0+"000",customerList.get("189901011111"));
+                        vehicleList.put(myMc.getKey(),myMc);
+
+                        slot = park (myMc,myGarage);
+                        if (slot != null)
+                            System.out.println("Slot "+slot+" found for "+myMc);
+                        else
+                            System.out.println("No slot found for "+myMc);
+
+                        Car   myCar   = new Car  (regNoP0+"111",customerList.get("189901011111"));
+                        vehicleList.put(myCar.getKey(),myCar);
+
+                        slot = park (myCar,myGarage);
+                        if (slot != null)
+                            System.out.println("Slot "+slot+" found for "+myCar);
+                        else
+                            System.out.println("No slot found for "+myCar);
+
+                        Truck myTruck = new Truck(regNoP0+"222",customerList.get("189901011111"));
+                        vehicleList.put(myTruck.getKey(),myTruck);
+
+                        slot = park (myTruck,myGarage);
+                        if (slot != null)
+                            System.out.println("Slot "+slot+" found for "+myTruck);
+                        else
+                            System.out.println("No slot found for "+myTruck);
 
                         ArticulatedLorry myLorry =
-                                new ArticulatedLorry("ABC333",customerList.get("189901011111"),2);
-                        System.out.println(myLorry +" "+ countNoOfFreeSlots(garageList.get("DROTTNINGGATAN 8"),myLorry.getSize()));
+                                new ArticulatedLorry(regNoP0+"333",customerList.get("189901011111"),2);
+                        vehicleList.put(myLorry.getKey(),myLorry);
+
+                        slot = park (myLorry,myGarage);
+                        if (slot != null)
+                            System.out.println("Slot "+slot+" found for "+myLorry);
+                        else
+                            System.out.println("No slot found for "+myLorry);
+
+                        System.out.println("No of free slots "+countAllFreeSlots (myGarage));
+
+                        break;
+
+                    case "81":
+
+
+                        System.out.print("Reg Nos (3 char)");
+                        String regNoP1 = StdIO.readLine();
+
+                        unpark(vehicleList.get(regNoP1+"000"));
+                        unpark(vehicleList.get(regNoP1+"111"));
+                        unpark(vehicleList.get(regNoP1+"222"));
+                        unpark(vehicleList.get(regNoP1+"333"));
 
                         break;
                     case "88":
@@ -204,17 +252,63 @@ public class GarageAdmin {
                         Account account = new Account(customer, "12345678901234567890", 0.0, "Kalles head account");
                         accountList.put(account.getKey(), account);
 
-                        Garage garage = new Garage ("DROTTNINGGATAN 8","Litet garage");
-                        garageList.put(garage.getKey(), garage);
+                        //----------------------------------------------------------------------------------------
+
+                        Garage garage1 = new Garage ("DROTTNINGGATAN 8A","Litet garage");
+                        garageList.put(garage1.getKey(), garage1);
                         Floor floor = new Floor(1,"1 bil plats plus två mc platser");
-                        ParkingSlot slotCar1 = new ParkingSlot (garage,floor,1,Vehicle.Size.MEDIUM);
+                        ParkingSlot slotCar1 = new ParkingSlot (garage1,floor,1,Vehicle.Size.MEDIUM);
                         parkingSlotList.put(slotCar1.getKey(),slotCar1);
 
-                        ParkingSlot slotMc1  = new ParkingSlot (garage,floor,1,Vehicle.Size.SMALL);
+                        ParkingSlot slotMc1  = new ParkingSlot (garage1,floor,2,Vehicle.Size.SMALL);
                         parkingSlotList.put(slotMc1.getKey(),slotMc1);
 
-                        ParkingSlot slotMc2  = new ParkingSlot (garage,floor,1,Vehicle.Size.SMALL);
+                        ParkingSlot slotMc2  = new ParkingSlot (garage1,floor,3,Vehicle.Size.SMALL);
                         parkingSlotList.put(slotMc2.getKey(),slotMc2);
+
+                        //----------------------------------------------------------------------------------------
+
+                        Garage garage2 = new Garage
+                                ("DROTTNINGGATAN 8B","Lite större garage, tre våningsplan");
+
+                        garageList.put(garage2.getKey(), garage2);
+                        Floor floor1 = new Floor(1,"1 bil plats plus två mc platser");
+                        ParkingSlot slotCar21 = new ParkingSlot (garage2,floor1,1,Vehicle.Size.MEDIUM);
+                        parkingSlotList.put(slotCar21.getKey(),slotCar21);
+
+                        ParkingSlot slotMc21  = new ParkingSlot (garage2,floor1,2,Vehicle.Size.SMALL);
+                        parkingSlotList.put(slotMc21.getKey(),slotMc21);
+
+                        ParkingSlot slotMc22  = new ParkingSlot (garage2,floor1,3,Vehicle.Size.SMALL);
+                        parkingSlotList.put(slotMc22.getKey(),slotMc22);
+
+                        Floor floor2 = new Floor(2,"plats för 3 mc, 2 bil, 1 Truck  platser");
+
+                        ParkingSlot slotMc31  = new ParkingSlot (garage2,floor2,1,Vehicle.Size.SMALL);
+                        parkingSlotList.put(slotMc31.getKey(),slotMc31);
+
+                        ParkingSlot slotMc32  = new ParkingSlot (garage2,floor2,2,Vehicle.Size.SMALL);
+                        parkingSlotList.put(slotMc32.getKey(),slotMc32);
+
+                        ParkingSlot slotMc33  = new ParkingSlot (garage2,floor2,3,Vehicle.Size.SMALL);
+                        parkingSlotList.put(slotMc33.getKey(),slotMc33);
+
+                        ParkingSlot slotMc34  = new ParkingSlot (garage2,floor2,4,Vehicle.Size.MEDIUM);
+                        parkingSlotList.put(slotMc34.getKey(),slotMc34);
+
+                        ParkingSlot slotMc35  = new ParkingSlot (garage2,floor2,5,Vehicle.Size.MEDIUM);
+                        parkingSlotList.put(slotMc35.getKey(),slotMc35);
+
+                        ParkingSlot slotMc36  = new ParkingSlot (garage2,floor2,6,Vehicle.Size.LARGE);
+                        parkingSlotList.put(slotMc36.getKey(),slotMc36);
+
+                        Floor floor3 = new Floor(3,"plats för 2 långtradare platser");
+
+                        ParkingSlot slotMc41  = new ParkingSlot (garage2,floor3,1,Vehicle.Size.HUGE);
+                        parkingSlotList.put(slotMc41.getKey(),slotMc41);
+
+                        ParkingSlot slotMc42  = new ParkingSlot (garage2,floor3,2,Vehicle.Size.HUGE);
+                        parkingSlotList.put(slotMc42.getKey(),slotMc42);
 
                         break;
                     //case "70":
@@ -232,7 +326,7 @@ public class GarageAdmin {
                         System.out.println("");
                         listVehicles();
                         System.out.println("");
-                        listParkings();
+                        listScannings();
                         System.out.println("");
                         listGarages();System.out.println("");
                         //listFloors();System.out.println("");
@@ -246,18 +340,13 @@ public class GarageAdmin {
             }
         } while (!answer.equalsIgnoreCase("q"));
 
-        if (accountList != null)
-            FileIO.writeObject(accountList, accountFile);
-        if (customerList != null)
-            FileIO.writeObject(customerList, customerFile);
-        if (scanningList != null)
-            FileIO.writeObject(scanningList, scanningFile);
-        if (userList != null)
-            FileIO.writeObject(userList, userFile);
-        if (parkingSlotList != null)
-            FileIO.writeObject(parkingSlotList, parkingSlotFile);
-        //if (atmHwList != null)
-        //    FileIO.writeObject(atmHwList,atmHwFile);
+        if (accountList     != null) FileIO.writeObject(accountList, accountFile);
+        if (customerList    != null) FileIO.writeObject(customerList, customerFile);
+        if (scanningList    != null) FileIO.writeObject(scanningList, scanningFile);
+        if (userList        != null) FileIO.writeObject(userList, userFile);
+        if (parkingSlotList != null) FileIO.writeObject(parkingSlotList, parkingSlotFile);
+        if (garageList      != null) FileIO.writeObject(garageList, garageFile);
+        if (vehicleList     != null) FileIO.writeObject(vehicleList, vehicleFile);
     }
 
     private String menu() {
@@ -311,9 +400,45 @@ public class GarageAdmin {
         }
     }
 
-    //private String TransactionToString (Scannings trans) {
-    //    return trans.toString();
-    //}
+     public ParkingSlot park (Vehicle vehicle, Garage inGarage){
+
+        ParkingSlot slot = getNextFree (inGarage,vehicle.getSize());
+        if (slot != null) {
+
+            slot.setParked (vehicle);
+
+            parkingSlotList.put(slot.getKey(),slot);
+            FileIO.writeObject(parkingSlotList, parkingSlotFile);
+        }
+
+        return slot;
+    }
+
+    public ParkingSlot getSlot (Vehicle vehicle){
+
+        for (ParkingSlot slot : parkingSlotList.values()) {
+            if (!slot.isFree() && slot.getParked().barcode.equals(vehicle.barcode)) {
+                 return slot; // found, exit loop
+            }
+        }
+        return null;
+    }
+
+    public void unpark (Vehicle vehicle){
+
+        ParkingSlot slot = getSlot (vehicle);
+        if (slot == null) {
+            StdIO.ErrorReport("Not parked "+vehicle);
+            return;
+        }
+
+        long minutes = slot.free();
+        parkingSlotList.put(slot.getKey(),slot);
+        FileIO.writeObject(parkingSlotList, parkingSlotFile);
+
+        System.out.println("The "+vehicle+" was parked for "+minutes+ " minutes");
+    }
+
     public String listAllTransactions() {
         String str = "";
         for (Scannings x : scanningList) {
@@ -373,7 +498,7 @@ public class GarageAdmin {
         FileIO.writeObject(accountList, accountFile);
     }
 
-    private void listParkings() {
+    private void listScannings() {
         System.out.println(Scannings.toStringHeader());
         if (scanningList != null)
             scanningList.stream().forEach(item -> System.out.println(item.toStringLine()));
@@ -596,8 +721,15 @@ public class GarageAdmin {
 
     private void listParkingSlots() {
         System.out.println(ParkingSlot.toStringHeader());
-        if (parkingSlotList != null)
-            parkingSlotList.forEach((k, v) -> System.out.println(v.toStringLine()));
+        //if (parkingSlotList != null)
+         //   parkingSlotList.forEach((k, v) -> System.out.println(v.toStringLine()));
+
+        parkingSlotList.values().stream()
+                //.sorted()
+                .sorted(Comparator.comparing(item -> item.getPlaceNo()))
+                .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
+                .sorted(Comparator.comparing(item -> item.getGarage().getName()))
+                .forEach(item -> System.out.println(item.toStringLine()));
     }
 
     private int countNoOfFreeSlots (Garage garage, Vehicle.Size withSize) {
@@ -611,7 +743,16 @@ public class GarageAdmin {
         return noOfItems;
     }
 
-    private ParkingSlot getNextFree (Garage garage, Vehicle.Size withSize) {
+    private int countAllFreeSlots (Garage garage) {
+        int noOfItems = 0;
+
+        for (Vehicle.Size size : Vehicle.Size.values())
+            noOfItems += countNoOfFreeSlots (garage,size);
+
+        return noOfItems;
+    }
+
+    private ParkingSlot getNextFreeWithSize (Garage garage, Vehicle.Size withSize) {
 
         for (ParkingSlot x : parkingSlotList.values()) {
             if (garage.getKey().equals(x.getGarage().getKey()) && x.isFree() && x.getSize() == withSize) {
@@ -619,18 +760,37 @@ public class GarageAdmin {
             }
         }
 
-        throw new IllegalCallerException("Full, no free slot exists with the requeste size");
+        return null; // Not found
+        //throw new IllegalCallerException("Full, no free slot exists with the requeste size");
     }
 
+    private ParkingSlot getNextFree (Garage garage, Vehicle.Size fromSize) {
+
+        //for (Vehicle.Size i=fromSize;i.equals("HUGE");Vehicle.Size.values()) {
+        //    System.out.println(i);
+        //}
+
+        for ( Vehicle.Size size : Vehicle.Size.values()) {
+            if (size.compareTo(fromSize) >=0 ){
+                ParkingSlot temp = getNextFreeWithSize(garage,size);
+                if (temp != null) return temp;
+            }
+        }
+
+        return null; // Not found
+        //throw new IllegalCallerException("Full, no free slot exists with the requeste size");
+    }
+
+
     private void listFilteredItem(String name, ParkingSlot v) {
-        if (name.equalsIgnoreCase(v.getGarage().getName()))
+        if (name.equals(v.getGarage().getName()))
             System.out.println(v.toStringLine());
     }
 
     private void listGarage(Garage garage) {
 
         System.out.println(garage.getName() + " "+ garage.getDescription());
-        System.out.println();
+        //System.out.println();
         System.out.println(ParkingSlot.toStringHeader());
         if (parkingSlotList != null)
             parkingSlotList.forEach((k, v) -> listFilteredItem(garage.getName(), v));
