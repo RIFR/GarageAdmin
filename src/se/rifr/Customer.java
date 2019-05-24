@@ -6,13 +6,15 @@ public class Customer implements java.io.Serializable{
     private String lastName;
     private String barCode;
     private String email;
+    private String telephoneNumber;
     private String userName;
 
-    public Customer(String firstName, String lastName, String barCode, String email, String userName) {
+    public Customer(String firstName, String lastName, String barCode, String email, String telephoneNumber, String userName) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.barCode = barCode;
         this.email = email;
+        this.telephoneNumber = telephoneNumber;
         this.userName = userName;
     }
 
@@ -64,6 +66,14 @@ public class Customer implements java.io.Serializable{
         this.barCode = barCode;
     }
 
+    public String getTelephoneNumber() {
+        return telephoneNumber;
+    }
+
+    public void setTelephoneNumber(String telephoneNumber) {
+        this.telephoneNumber = telephoneNumber;
+    }
+
     @Override
     public String toString() {
         return "Customer{" +
@@ -71,6 +81,7 @@ public class Customer implements java.io.Serializable{
                 ", lastName='" + lastName + '\'' +
                 ", userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
+                ", telephoneNo='" + telephoneNumber + '\'' +
                 ", barCode='" + barCode + '\'' +
                 '}';
     }
@@ -81,6 +92,7 @@ public class Customer implements java.io.Serializable{
         returnString += Str.padRight("Lastname",16);
         returnString += Str.padRight("Barcode",14);
         returnString += Str.padRight("email",40);
+        returnString += Str.padRight("telephoneNo",20);
         returnString += Str.padRight("Username",20);
         returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
         return returnString;
@@ -92,6 +104,7 @@ public class Customer implements java.io.Serializable{
         returnString += Str.padRight(getLastName(),16);
         returnString += Str.padRight(getBarCode(),14);
         returnString += Str.padRight(getEmail(),40);
+        returnString += Str.padRight(getTelephoneNumber(),20);
         returnString += Str.padRight(getUserName(),20);
         return returnString;
     }

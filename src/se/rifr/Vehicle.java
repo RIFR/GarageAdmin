@@ -4,19 +4,24 @@ public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
 
     public static enum Size {SMALL,MEDIUM,LARGE,HUGE};
 
-    String           barcode;
-    //String           model;
-    //String           colour;
-    //int              noOfWheels;
-    //int              noiseLevel; // 0-9, 9 highest
-    //String           fuel;
-    Size             size;
-    //boolean          ReportedStolen;
-    Customer         customer;
+    private String   barcode;
+    private String   model;
+    private String   colour;
+    private int      noOfWheels;
+    private int      noiseLevel; // 0-9, 9 highest
+    private String   fuel;
+    private Size     size;
+    private Customer customer;
 
-    public Vehicle(String barcode, Size needSize, Customer customer) {
-        this.barcode  = barcode;
-        this.size     = needSize;
+    public Vehicle(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Size size, Customer customer) {
+
+        this.barcode = barcode;
+        this.model = model;
+        this.colour = colour;
+        this.noOfWheels = noOfWheels;
+        this.noiseLevel = noiseLevel;
+        this.fuel = fuel;
+        this.size = size;
         this.customer = customer;
     }
 
@@ -26,15 +31,11 @@ public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
         return barcode;
     }
 
-    public void setBarcode(String barcode) {
-        this.barcode = barcode;
-    }
-
     public Size getSize() {
         return size;
     }
 
-    public void seSize(Size size) {
+    public void setSize(Size size) {
         this.size = size;
     }
 
@@ -46,39 +47,81 @@ public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
         this.customer = customer;
     }
 
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getColour() {
+        return colour;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
+    }
+
+    public int getNoOfWheels() {
+        return noOfWheels;
+    }
+
+    public void setNoOfWheels(int noOfWheels) {
+        this.noOfWheels = noOfWheels;
+    }
+
+    public int getNoiseLevel() {
+        return noiseLevel;
+    }
+
+    public void setNoiseLevel(int noiseLevel) {
+        this.noiseLevel = noiseLevel;
+    }
+
+    public String getFuel() {
+        return fuel;
+    }
+
+    public void setFuel(String fuel) {
+        this.fuel = fuel;
+    }
+
     @Override
     public String toString() {
         return "Vehicle{" + Str.padRight(barcode.trim(),10) +
-                "Need Size=" + Str.padLeft(size.toString(),10) +
-                //"Colour=" + Str.padLeft(colour.trim(),20) +
-                //", NoOfWheels=" + Str.padLeft(Integer.toString(noOfWheels),10) +
-                //", NoiseLevel=" + Str.padLeft(Integer.toString(noiseLevel),10) +
-                //", Fuel=" + Str.padLeft(fuel,10) +
-                ", Customer=" + Str.padLeft(customer.getFullName(),30) +
+                ",Size=" + Str.padLeft(size.toString(),10) +
+                ",Colour=" + Str.padLeft(colour.trim(),20) +
+                ",NoOfWheels=" + Str.padLeft(Integer.toString(noOfWheels),10) +
+                ",NoiseLevel=" + Str.padLeft(Integer.toString(noiseLevel),10) +
+                ",Fuel=" + Str.padLeft(fuel,10) +
+                ",Customer=" + Str.padLeft(customer.getFullName(),30) +
                 '}';
     }
 
     public static String toStringHeader() {
         String returnString;
-        returnString = Str.padRight("Barcode",10);
-        returnString += Str.padRight("Need size",10);
-        //returnString += Str.padRight("Colour",20);
-        //returnString += Str.padRight("No Of Wheels",10);
-        //returnString += Str.padRight("Noise Level",10);
-        //returnString += Str.padRight("Fuel",10);
+        returnString = Str.padRight("Barcode",16);
+        returnString += Str.padRight("Class",16);
+        returnString += Str.padRight("Colour",14);
+        returnString += Str.padRight("NoOfWheels",20);
+        returnString += Str.padRight("NoiseLevel",20);
+        returnString += Str.padRight("Fuel",20);
+        returnString += Str.padRight("Size",20);
         returnString += Str.padRight("Name",30);
-        returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
+         returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
         return returnString;
     }
 
     public String toStringLine() {
         String returnString;
-        returnString  = Str.padRight(getBarcode(),10);
-        returnString += Str.padRight(getSize().toString(),10);
-        //returnString += Str.padRight(getColour(),20);
-        //returnString += Str.padRight(Integer.toString(getNoOfWheels()),10);
-        //returnString += Str.padRight(Integer.toString(getNoiseLevel()),10);
-        //returnString += Str.padRight(getFuel(),10);
+        returnString  = Str.padRight(getBarcode(),16);
+        returnString += Str.padRight(getClass().getSimpleName(),16);
+        returnString += Str.padRight(getColour(),14);
+        returnString += Str.padRight(Integer.toString(getNoOfWheels()),20);
+        returnString += Str.padRight(Integer.toString(getNoiseLevel()),20);
+        returnString += Str.padRight(getFuel(),20);
+        returnString += Str.padRight(getSize().toString(),20);
         if (getCustomer()!= null)
             returnString += Str.padRight(getCustomer().getFullName(),30);
         return returnString;
@@ -91,31 +134,38 @@ public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
 
 class Mc extends Vehicle {
 
-    public Mc(String registrationNumber, Customer customer) {
-        super(registrationNumber, Size.SMALL, customer);
+    public Mc(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
+        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.SMALL, customer);
     }
 }
 
 class Car extends Vehicle {
 
-    public Car(String registrationNumber, Customer customer) {
-        super(registrationNumber, Size.MEDIUM, customer);
+    public Car(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
+        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.MEDIUM, customer);
     }
 }
 
 class Truck extends Vehicle {
 
-    public Truck(String registrationNumber, Customer customer) {
-        super(registrationNumber, Size.LARGE, customer);
+    public Truck(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
+        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.LARGE, customer);
+    }
+}
+class Lorry extends Vehicle {
+
+    public Lorry(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
+        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.LARGE, customer);
     }
 }
 
-class ArticulatedLorry extends Vehicle {
+//Långtradare
+class Juggernaut extends Vehicle {
 
     int noOfBeds;
 
-    public ArticulatedLorry(String registrationNumber, Customer customer,int noOfBeds) {
-        super(registrationNumber, Size.HUGE, customer);
+    public Juggernaut(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer, int noOfBeds) {
+        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.HUGE, customer);
         this.noOfBeds = noOfBeds;
     }
 

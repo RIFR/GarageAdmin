@@ -6,7 +6,7 @@ public class Scannings implements java.io.Serializable{
 
     private Vehicle vehicle;
     private LocalDateTime time;
-    private boolean entered;  // entered or withdraw
+    private boolean entered;  // Enter or leaving
 
     public Scannings(Vehicle vehicle, LocalDateTime time, boolean entered) {
         this.vehicle = vehicle;

@@ -6,15 +6,17 @@ public class Account implements java.io.Serializable{
     private String bankId;
     private double saldo;
     private String description;
+    private long   parkedTime; // minutes since last payment
 
     public Account(Customer customer, String bankId, double saldo, String description) {
         this.customer    = customer;
         this.bankId      = bankId;
         this.saldo       = saldo;
         this.description = description;
+        this.parkedTime  = 0;
     }
 
-    public String getKey() { return bankId; }
+    public String getKey() { return customer.getBarCode(); }
 
     public String getBankId() {
         return bankId;
@@ -52,11 +54,28 @@ public class Account implements java.io.Serializable{
         saldo += (deposit ? amount : -amount);
     }
 
+    public long getParkedTime() {
+        return parkedTime;
+    }
+
+    public void setParkedTime(long parkedTime) {
+        this.parkedTime = parkedTime;
+    }
+
+    public void updateParkedTime(long parkedTime) {
+        this.parkedTime += parkedTime;
+    }
+
+    public void clearParkedTime() {
+        this.parkedTime = 0;
+    }
+
     @Override
     public String toString() {
         return "Account{" + Str.padRight(customer.getFullName(),30) +
                 "id=" + Str.padLeft(bankId.trim(),20) +
                 ", saldo=" + Str.padLeft(Double.toString(saldo).trim(),10) +
+                ", parked=" + Str.padLeft(Long.toString(parkedTime).trim(),10) +
                 ", description='" + description + '\'' +
                 '}';
     }
@@ -68,6 +87,7 @@ public class Account implements java.io.Serializable{
         returnString += Str.padRight("Barcode",14);
         returnString += Str.padRight("Account No",40);
         returnString += Str.padRight("Saldo",20);
+        returnString += Str.padRight("Parked Time (min)",20);
         returnString += Str.padRight("Description",20);
         returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
         return returnString;
@@ -80,6 +100,7 @@ public class Account implements java.io.Serializable{
         returnString += Str.padRight(customer.getBarCode(),14);
         returnString += Str.padRight(getBankId(),40);
         returnString += Str.padRight(Double.toString(getSaldo()),20);
+        returnString += Str.padRight(Long.toString(getParkedTime()),20);
         returnString += Str.padRight(getDescription(),20);
         return returnString;
     }

@@ -66,6 +66,10 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         this.size = size;
     }
 
+    public LocalDateTime getTimeParked() {
+        return timeParked;
+    }
+
     public long free() {
         this.parked = null;
         Duration duration = Duration.between(LocalDateTime.now(), this.timeParked);
@@ -84,10 +88,13 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
     public String toString() {
         String returnString;
         returnString = "Garage{Name=" + Str.padRight(getGarage().getName(),30);
-        returnString += ", Floor='" +  Str.padRight(Integer.toString(getFloor().getLevel()),5);
-        returnString += ", Index='" +  Str.padRight(Integer.toString(getPlaceNo()),5);
-        if (this.parked != null)
+        returnString += ", Floor='" +  Str.padRight(Integer.toString(getFloor().getLevel()),10);
+        returnString += ", Index='" +  Str.padRight(Integer.toString(getPlaceNo()),10);
+        returnString += ", Size='" +  Str.padRight(getSize().toString(),10);
+        if (this.parked != null) {
             returnString += ", Vehicle='" +  Str.padRight(getParked().getBarcode(),20);
+            returnString += ", Time='" +  Str.padRight(getTimeParked().toString().substring(0,19),20);
+       }
         returnString += '}';
         return returnString;
     }
@@ -97,7 +104,10 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         returnString  = Str.padRight("Name",30);
         returnString += Str.padRight("Floor",10);
         returnString += Str.padRight("Index",10);
+        returnString += Str.padRight("Size",10);
         returnString += Str.padRight("Parked",20);
+        returnString += Str.padRight("Parked at time",20);
+        returnString += Str.padRight("Telephone Number",20);
         returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
         return returnString;
     }
@@ -107,8 +117,13 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         returnString  = Str.padRight(getGarage().getName(),30);
         returnString += Str.padRight(Integer.toString(getFloor().getLevel()),10);
         returnString += Str.padRight(Integer.toString(getPlaceNo()),10);
-        if (this.parked != null)
+        returnString += Str.padRight(getSize().toString(),10);
+        if (this.parked != null) {
             returnString += Str.padRight(getParked().getBarcode(),20);
+            returnString += Str.padRight(getTimeParked().toString().substring(0,19),20);
+            returnString += Str.padRight(Long.toString(Math.abs(Duration.between(LocalDateTime.now(), getTimeParked()).toMinutes())),20);
+            returnString += Str.padRight(getParked().getCustomer().getTelephoneNumber(),20);
+        }
 
         return returnString;
     }
