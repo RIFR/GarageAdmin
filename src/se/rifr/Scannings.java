@@ -7,11 +7,13 @@ public class Scannings implements java.io.Serializable{
     private Vehicle vehicle;
     private LocalDateTime time;
     private boolean entered;  // Enter or leaving
+    private Garage garage;
 
-    public Scannings(Vehicle vehicle, LocalDateTime time, boolean entered) {
+    public Scannings(Vehicle vehicle, LocalDateTime time, boolean entered, Garage garage) {
         this.vehicle = vehicle;
-        this.time    = time;
+        this.time = time;
         this.entered = entered;
+        this.garage = garage;
     }
 
     public Vehicle getVehicle() {
@@ -26,18 +28,22 @@ public class Scannings implements java.io.Serializable{
         return entered;
     }
 
+    public Garage getGarage() { return garage; }
+
     @Override
     public String toString() {
-        return Str.padRight(vehicle.getBarcode(),30) +
-              time.toLocalTime().toString().substring(0,8) + " " +
-                (entered ? "ENTERED   ":"LEAVING ");
+        return Str.padRight(vehicle.getBarcode(),10) +
+              time.toLocalTime().toString().substring(0,19) + " " +
+                (entered ? "ENTERED   ":"LEAVING " + " " +
+                 Str.padRight(getGarage().getName(),30));
     }
 
     public static String toStringHeader() {
         String returnString;
         returnString  = Str.padRight("Reg No",16);
-         returnString += Str.padRight("Time",16);
-        returnString += Str.padRight("Direction",14);
+        returnString += Str.padRight("ENTER/LEAVE",16);
+        returnString += Str.padRight("Garage",30);
+        returnString += Str.padRight("Time",30);
         returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
         return returnString;
     }
@@ -45,8 +51,9 @@ public class Scannings implements java.io.Serializable{
     public String toStringLine() {
         String returnString;
         returnString  = Str.padRight(getVehicle().getBarcode(),16);
-        returnString += Str.padRight(getTime().toString().substring(0,19),16);
-        returnString += Str.padRight((isEntered() ? "ENTERED":"LEAVING"),14);
+        returnString += Str.padRight((isEntered() ? "ENTERED":"LEAVING"),16);
+        returnString += Str.padRight(getGarage().getName(),30);
+        returnString += Str.padRight(getTime().toString().substring(0,19),30);
         return returnString;
     }
 

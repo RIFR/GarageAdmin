@@ -4,10 +4,12 @@ public class Garage implements java.io.Serializable{
 
     private String name;
     private String description;
+    private double feePerHour;
 
-    public Garage(String name, String description) {
+    public Garage(String name, String description, double feePerHour) {
         this.name = name;
         this.description = description;
+        this.feePerHour = feePerHour;
     }
 
     public String getKey() {
@@ -26,16 +28,30 @@ public class Garage implements java.io.Serializable{
         this.description = description;
     }
 
+    public double getFeePerHour() {
+        return feePerHour;
+    }
+
+    public void setFeePerHour(double feePerHour) {
+        this.feePerHour = feePerHour;
+    }
+
+    public double getFeePerMinute() {
+        return feePerHour / 60.0d;
+    }
+
     @Override
     public String toString() {
         return "Garage{Name=" + Str.padRight(getName(),30) +
-                ", description='" + description + '\'' +
+                ", Cost/Hour="+Str.padRight(Double.toString(getFeePerHour()),10) +
+                ", Description='" + description + '\'' +
                 '}';
     }
 
     public static String toStringHeader() {
         String returnString;
-        returnString  = Str.padRight("Name",16);
+        returnString  = Str.padRight("Name",30);
+        returnString += Str.padRight("Cost/Hour",10);
         returnString += Str.padRight("Description",30);
         returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
         return returnString;
@@ -43,7 +59,8 @@ public class Garage implements java.io.Serializable{
 
     public String toStringLine() {
         String returnString;
-        returnString  = Str.padRight(getName(),16);
+        returnString  = Str.padRight(getName(),30);
+        returnString  = Str.padRight(Double.toString(getFeePerHour()),10);
         returnString += Str.padRight(getDescription(),30);
         return returnString;
     }
