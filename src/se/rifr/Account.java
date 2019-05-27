@@ -100,7 +100,7 @@ public class Account implements java.io.Serializable{
         returnString += Str.padRight(customer.getBarCode(),14);
         returnString += Str.padRight(getBankId(),40);
         returnString += Str.padRight(Double.toString(getSaldo()),20);
-        returnString += Str.padRight(Long.toString(getParkedTime()),20);
+        returnString += Str.padLeft(Long.toString(getParkedTime()) +"   ",20);
         returnString += Str.padRight(getDescription(),20);
         return returnString;
     }

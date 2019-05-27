@@ -116,11 +116,11 @@ public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
     public String toStringLine() {
         String returnString;
         returnString  = Str.padRight(getBarcode(),16);
-        returnString += Str.padRight(getClass().getSimpleName(),16);
+        returnString += Str.padRight(getClass().getSimpleName().toUpperCase(),16);
         returnString += Str.padRight(getColour(),14);
         returnString += Str.padRight(Integer.toString(getNoOfWheels()),20);
         returnString += Str.padRight(Integer.toString(getNoiseLevel()),20);
-        returnString += Str.padRight(getFuel(),20);
+        returnString += Str.padRight(getFuel().toUpperCase(),20);
         returnString += Str.padRight(getSize().toString(),20);
         if (getCustomer()!= null)
             returnString += Str.padRight(getCustomer().getFullName(),30);
