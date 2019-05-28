@@ -1,6 +1,6 @@
 package se.rifr;
 
-public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
+public class Vehicle implements java.io.Serializable { // Comparable<Vehicle>, java.io.Serializable {
 
     public static enum Size {SMALL,MEDIUM,LARGE,HUGE};
 
@@ -139,9 +139,9 @@ public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
         return returnString;
     }
 
-    @Override
-    public int compareTo(Vehicle o) { return size.compareTo(o.size);
-    }
+    //@Override
+    // public int compareTo(Vehicle o) { return size.compareTo(o.size);
+    //}
 }
 
 class Mc extends Vehicle {

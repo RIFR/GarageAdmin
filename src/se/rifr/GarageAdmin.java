@@ -905,7 +905,7 @@ public class GarageAdmin {
             vehicle.setFuel(fuel);
             vehicle.setCustomer(customer);
 
-            switch (vehicle.getClass().getSimpleName()) {
+            switch (vehicle.getClass().getSimpleName().toUpperCase().trim()) {
                 case "BUS" :
                     StdIO.write("No Of Seats: ");
                     int noOfSeats = Integer.valueOf(StdIO.readLine());
