@@ -524,7 +524,7 @@ public class GarageAdmin {
             StdIO.writeLine("Scan Parking");
 
             StdIO.writeLine("Vehicle barcode");
-            String barcode = StdIO.readLine();
+            String barcode = StdIO.readLine().trim().toUpperCase();
 
             if (vehicleList.containsKey(barcode))
                 vehicle = vehicleList.get(barcode);
