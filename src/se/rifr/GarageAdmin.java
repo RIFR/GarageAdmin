@@ -49,7 +49,7 @@ public class GarageAdmin {
 
     }
 
-    private void LoadReloadData() {
+    public void LoadReloadData() {
 
         try {
             Map<String, User> tempUserList = FileIO.readObject(userFile);
@@ -119,7 +119,70 @@ public class GarageAdmin {
     }
 
     public boolean loginOk(String username, String password) {
-        return (userList.containsKey(username) && userList.get(username).getPassword().equals(password));
+        return userList.containsKey(username) && userList.get(username).getPassword().equals(password);
+    }
+
+    public boolean garageExists(String name) {
+        return (garageList.containsKey(name.toUpperCase()));
+    }
+
+    public boolean customerExists(String customerBarcode) {
+        return customerList.containsKey(customerBarcode.toUpperCase());
+    }
+
+    public Customer getCustomer(String barcode) {
+        return customerList.get(barcode);
+    }
+    public void createCustomer(String firstName,String lastName,String barcode,String email,String telno) {
+
+        Customer customer = new Customer(firstName,lastName,barcode,email,telno,
+                firstName.substring(0,1).toUpperCase()+lastName.substring(0,1).toUpperCase());
+
+        customerList.put(customer.getKey(),customer);
+        FileIO.writeObject(customerList, customerFile);
+    }
+
+    public boolean isRegistered(String vehicleBarcode) {
+         return vehicleList.containsKey(vehicleBarcode);
+    }
+
+    public boolean isParked(String vehicleBarcode) {
+        return isRegistered(vehicleBarcode) && getSlot (vehicleList.get(vehicleBarcode.toUpperCase()))!= null;
+    }
+
+    public Vehicle getVehicle(String vehicleBarcode) {
+        if (vehicleList.containsKey(vehicleBarcode)) return vehicleList.get(vehicleBarcode);
+        else throw new IllegalArgumentException("Vehicle "+vehicleBarcode+" not found");
+    }
+
+    public void createVehicle(String regNo, String kind, String model, String colour, Customer customer) {
+        Vehicle vehicle;
+        switch (kind.toUpperCase()){
+            case "MC" :
+                vehicle = new Mc(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+                break;
+            case "CAR" :
+                vehicle = new Car(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(),customer);
+                break;
+            case "TRUCK" :
+                vehicle = new Truck(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+                break;
+            case "LORRY" :
+                vehicle = new Lorry(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+                 break;
+            case "BUS" :
+                vehicle = new Bus(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer, 20);
+                break;
+            case "JUGGERNAUT" :
+                vehicle = new Juggernaut(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer, 0);
+                break;
+            default:
+                vehicle = new Vehicle(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+         }
+
+        vehicleList.put(vehicle.getKey(),vehicle);
+        FileIO.writeObject(vehicleList, vehicleFile);
+
     }
 
     public String parkVehicle (Vehicle vehicle, Garage garage) {
@@ -153,11 +216,6 @@ public class GarageAdmin {
     public Garage getGarage(String name) {
         if (garageList.containsKey(name)) return garageList.get(name);
         else throw new IllegalArgumentException("Garage "+name+" not found");
-    }
-
-    public Vehicle getVehicle(String barcode) {
-        if (vehicleList.containsKey(barcode)) return vehicleList.get(barcode);
-        else throw new IllegalArgumentException("Vehicle "+barcode+" not found");
     }
 
     public void start() {
@@ -609,13 +667,13 @@ public class GarageAdmin {
         FileIO.writeObject(accountList, accountFile);
     }
 
-    private void listScannings() {
+    public void listScannings() {
         System.out.println(Scannings.toStringHeader());
         if (scanningList != null)
             scanningList.stream().forEach(item -> System.out.println(item.toStringLine()));
     }
 
-    private void listUsers() {
+    public void listUsers() {
         System.out.println(User.toStringHeader());
         if (userList != null)
             userList.forEach((k, v) -> System.out.println(v.toStringLine()));
@@ -771,7 +829,7 @@ public class GarageAdmin {
         }
     }
 
-    private void listVehicles() {
+    public void listVehicles() {
         System.out.println(Vehicle.toStringHeader());
         if (vehicleList != null) {
             vehicleList.values().stream()
@@ -826,7 +884,7 @@ public class GarageAdmin {
             StdIO.write("FUEL: ");
             String fuel = StdIO.readLine().toUpperCase();
 
-            StdIO.write("CLASS (MC,CAR,TRUCK,LORRY,JUGGERNAUT): ");
+            StdIO.write("CLASS (MC,CAR,TRUCK,LORRY,BUS,JUGGERNAUT): ");
             String kind = StdIO.readLine().toUpperCase();
 
             //StdIO.write("Size ( ");
@@ -835,48 +893,36 @@ public class GarageAdmin {
             //StdIO.write("): ");
             //Vehicle.Size size = Vehicle.Size.valueOf(StdIO.readLine().toUpperCase());
 
-            if (vehicleList.containsKey(regNo)) {
-                vehicle = vehicleList.get(regNo);
+            // Create and store
+            if (!vehicleList.containsKey(regNo)) {createVehicle(regNo, kind, model, colour, customer); }
 
-                vehicle.setModel(model);
-                vehicle.setColour(colour);
-                vehicle.setNoOfWheels(noOfWheels);
-                vehicle.setNoiseLevel(noiseLevel);
-                vehicle.setFuel(fuel);
-                //vehicle.setSize(size);
-                vehicle.setCustomer(customer);
+            vehicle = vehicleList.get(regNo);
 
-            } else {
+            vehicle.setModel(model);
+            vehicle.setColour(colour);
+            vehicle.setNoOfWheels(noOfWheels);
+            vehicle.setNoiseLevel(noiseLevel);
+            vehicle.setFuel(fuel);
+            vehicle.setCustomer(customer);
 
-                switch (kind){
-                    case "MC" :
-                        vehicle = new Mc(regNo, model, colour, noOfWheels, noiseLevel, fuel, customer);
-                        break;
-                    case "CAR" :
-                        vehicle = new Car(regNo, model, colour, noOfWheels, noiseLevel, fuel, customer);
-                        break;
-                    case "TRUCK" :
-                        vehicle = new Truck(regNo, model, colour, noOfWheels, noiseLevel, fuel, customer);
-                        break;
-                    case "LORRY" :
-                        vehicle = new Lorry(regNo, model, colour, noOfWheels, noiseLevel, fuel, customer);
-                        break;
-                    case "JUGGERNAUT" :
-                        StdIO.write("No Of Beds: ");
-                        int noOfBeds = Integer.valueOf(StdIO.readLine());
+            switch (vehicle.getClass().getSimpleName()) {
+                case "BUS" :
+                    StdIO.write("No Of Seats: ");
+                    int noOfSeats = Integer.valueOf(StdIO.readLine());
 
-                        vehicle = new Juggernaut(regNo, model, colour, noOfWheels, noiseLevel, fuel, customer, noOfBeds);
-                        break;
-                    default:
-                        StdIO.write("Size (SMALL,MEDIUM,LARGE,HUGE): ");
-                        Vehicle.Size size = Vehicle.Size.valueOf(StdIO.readLine().toUpperCase());
+                    Bus bus = (Bus)vehicle;
+                    bus.setNoOfSeats(noOfSeats);
+                    vehicleList.put(bus.getKey(),bus);
+                    break;
+                case "JUGGERNAUT" :
+                    StdIO.write("No Of Beds: ");
+                    int noOfBeds = Integer.valueOf(StdIO.readLine());
 
-                        vehicle = new Vehicle(regNo, model, colour, noOfWheels, noiseLevel, fuel, size, customer);
-                }
+                    vehicle = new Juggernaut(regNo, model, colour, noOfWheels, noiseLevel, fuel, customer, noOfBeds);
+                    break;
             }
 
             vehicleList.put(vehicle.getKey(), vehicle);
-
             FileIO.writeObject(vehicleList, vehicleFile);
 
         } catch (Exception e) {
@@ -885,7 +931,7 @@ public class GarageAdmin {
         }
     }
 
-    private void listParkingSlots() {
+    public void listParkingSlots() {
         System.out.println(ParkingSlot.toStringHeader());
         //if (parkingSlotList != null)
          //   parkingSlotList.forEach((k, v) -> System.out.println(v.toStringLine()));
@@ -1023,7 +1069,7 @@ public class GarageAdmin {
         }
     }
 
-    private void listGarages() {
+    public void listGarages() {
         for (Garage x : garageList.values()) {
             listGarage (x);
             System.out.println();

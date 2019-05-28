@@ -13,6 +13,18 @@ public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
     private Size     size;
     private Customer customer;
 
+    public Vehicle(String barcode,String model, String colour, Customer customer) {
+
+        this.barcode    = barcode;
+        this.customer   = customer;
+        this.model      = model;
+        this.colour     = colour;
+
+        this.noOfWheels = 4;
+        this.noiseLevel = 5;
+        this.fuel       = "PETROL";
+        this.size       = Size.MEDIUM;
+    }
     public Vehicle(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Size size, Customer customer) {
 
         this.barcode = barcode;
@@ -134,6 +146,10 @@ public class Vehicle implements Comparable<Vehicle>, java.io.Serializable {
 
 class Mc extends Vehicle {
 
+    public Mc(String barcode, String model, String colour,Customer customer) {
+        super(barcode, model, colour, 2, 7, "PETROL", Size.SMALL, customer);
+    }
+
     public Mc(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
         super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.SMALL, customer);
     }
@@ -141,6 +157,9 @@ class Mc extends Vehicle {
 
 class Car extends Vehicle {
 
+    public Car(String barcode, String model, String colour,Customer customer) {
+        super(barcode, model, colour, 4, 3, "PETROL", Size.MEDIUM, customer);
+    }
     public Car(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
         super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.MEDIUM, customer);
     }
@@ -148,21 +167,50 @@ class Car extends Vehicle {
 
 class Truck extends Vehicle {
 
+    public Truck(String barcode, String model, String colour, Customer customer) {
+        super(barcode, model, colour, 4, 6, "DIESEL", Size.LARGE, customer);
+    }
     public Truck(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
         super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.LARGE, customer);
     }
 }
 class Lorry extends Vehicle {
 
+    public Lorry(String barcode, String model, String colour, Customer customer) {
+        super(barcode, model, colour, 4, 7, "DIESEL", Size.LARGE, customer);
+    }
     public Lorry(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
         super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.LARGE, customer);
     }
 }
 
+class Bus extends Vehicle {
+
+    int noOfSeats;
+
+    public Bus(String barcode, String model, String colour, Customer customer, int noOfSeats) {
+        super(barcode, model, colour, 8, 7, "DIESEL", Size.HUGE, customer);
+        this.noOfSeats = noOfSeats;
+    }
+
+    public Bus(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer, int noOfSeats) {
+        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.HUGE, customer);
+        this.noOfSeats = noOfSeats;
+    }
+
+    public int getNoOfSeats() { return noOfSeats; }
+
+    public void setNoOfSeats(int noOfSeats) { this.noOfSeats = noOfSeats; }
+}
 //Långtradare
 class Juggernaut extends Vehicle {
 
     int noOfBeds;
+
+    public Juggernaut(String barcode, String model, String colour,Customer customer, int noOfBeds) {
+        super(barcode, model, colour, 20, 6, "DIESEL", Size.HUGE, customer);
+        this.noOfBeds = noOfBeds;
+    }
 
     public Juggernaut(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer, int noOfBeds) {
         super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.HUGE, customer);
@@ -170,6 +218,8 @@ class Juggernaut extends Vehicle {
     }
 
     public int getNoOfBeds() { return noOfBeds; }
+
+    public void setNoOfBeds(int noOfBeds) { this.noOfBeds = noOfBeds; }
 }
 
 
