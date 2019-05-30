@@ -1,8 +1,8 @@
 package se.rifr;
 
-public class Vehicle implements java.io.Serializable { // Comparable<Vehicle>, java.io.Serializable {
+public abstract class Vehicle implements java.io.Serializable { // Comparable<Vehicle>, java.io.Serializable {
 
-    public static enum Size {SMALL,MEDIUM,LARGE,HUGE};
+    public enum Size {SMALL,MEDIUM,LARGE,HUGE};
 
     private String   barcode;
     private String   model;

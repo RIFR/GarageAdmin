@@ -133,13 +133,18 @@ public class GarageAdmin {
     public Customer getCustomer(String barcode) {
         return customerList.get(barcode);
     }
-    public void createCustomer(String firstName,String lastName,String barcode,String email,String telno) {
+    public void createCustomer(String firstName,String lastName,String barcode,String email,String telno, String userName) {
 
-        Customer customer = new Customer(firstName,lastName,barcode,email,telno,
-                firstName.substring(0,1).toUpperCase()+lastName.substring(0,1).toUpperCase());
+        Customer customer = new Customer(firstName,lastName,barcode,email,telno,userName);
 
         customerList.put(customer.getKey(),customer);
         FileIO.writeObject(customerList, customerFile);
+
+        updateAccountdWithUpdatedCustomer(customer); // update if exists in accounts
+    }
+
+    public void createCustomer(String firstName,String lastName,String barcode,String email,String telno) {
+        createCustomer(firstName,lastName,barcode,email,telno,firstName.substring(0,1).toUpperCase()+lastName.substring(0,1).toUpperCase());
     }
 
     public boolean isRegistered(String vehicleBarcode) {
@@ -177,7 +182,7 @@ public class GarageAdmin {
                 vehicle = new Juggernaut(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer, 0);
                 break;
             default:
-                vehicle = new Vehicle(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+                vehicle = new Car(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
          }
 
         vehicleList.put(vehicle.getKey(),vehicle);
@@ -641,13 +646,7 @@ public class GarageAdmin {
             StdIO.write("User name : ");
             String userName = StdIO.readLine();
 
-            Customer customer = new Customer(firstName, lastName, barcode, email, telephoneNo, userName);
-
-            customerList.put(customer.getKey(), customer);
-
-            FileIO.writeObject(customerList, customerFile);
-
-            updateAccountdWithUpdatedCustomer(customer); // update if exists in accounts
+            createCustomer(firstName, lastName, barcode, email, telephoneNo, userName);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -657,14 +656,15 @@ public class GarageAdmin {
 
     private void updateAccountdWithUpdatedCustomer(Customer customer) {
         for (Account x : accountList.values()) {
-            if (x.getCustomer().getKey() == customer.getKey()) {
+            if (x.getCustomer().getKey().equals(customer.getKey())) {
 
                 x.setCustomer(customer);
                 accountList.put(x.getKey(), x);
+                FileIO.writeObject(accountList, accountFile);
+                return; // found, quit
 
             }
         }
-        FileIO.writeObject(accountList, accountFile);
     }
 
     public void listScannings() {
@@ -698,10 +698,9 @@ public class GarageAdmin {
             String userName = StdIO.readLine();
             StdIO.write("Password  : ");
             String password = StdIO.readLine();
+
             User user = new User(firstName, lastName, barcode, email, userName, password);
-
             userList.put(user.getKey(), user);
-
             FileIO.writeObject(userList, userFile);
 
         } catch (Exception e) {
