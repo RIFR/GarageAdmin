@@ -1,6 +1,8 @@
 package se.rifr;
 
-public class Vehicle implements java.io.Serializable { // Comparable<Vehicle>, java.io.Serializable {
+import java.util.Objects;
+
+public abstract class Vehicle implements java.io.Serializable { // Comparable<Vehicle>, java.io.Serializable {
 
     public static enum Size {SMALL,MEDIUM,LARGE,HUGE};
 
@@ -13,29 +15,42 @@ public class Vehicle implements java.io.Serializable { // Comparable<Vehicle>, j
     private Size     size;
     private Customer customer;
 
-    public Vehicle(String barcode,String model, String colour, Customer customer) {
+    public Vehicle(Builder builder) {
 
-        this.barcode    = barcode;
-        this.customer   = customer;
-        this.model      = model;
-        this.colour     = colour;
+        this.barcode    = Objects.requireNonNull(builder.barcode);
+        this.model      = builder.model;
+        this.colour     = builder.colour;
+        this.noOfWheels = builder.noOfWheels;
+        this.noiseLevel = builder.noiseLevel;
+        this.fuel       = builder.fuel;
+        this.size       = builder.size;
+        this.customer   = Objects.requireNonNull(builder.customer);
 
-        this.noOfWheels = 4;
-        this.noiseLevel = 5;
-        this.fuel       = "PETROL";
-        this.size       = Size.MEDIUM;
     }
-    public Vehicle(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Size size, Customer customer) {
 
-        this.barcode = barcode;
-        this.model = model;
-        this.colour = colour;
-        this.noOfWheels = noOfWheels;
-        this.noiseLevel = noiseLevel;
-        this.fuel = fuel;
-        this.size = size;
-        this.customer = customer;
-    }
+//    public Vehicle(String barcode,String model, String colour, Customer customer) {
+//
+//        this.barcode    = barcode;
+//        this.customer   = customer;
+//        this.model      = model;
+//        this.colour     = colour;
+//
+//        this.noOfWheels = 4;
+//        this.noiseLevel = 5;
+//        this.fuel       = "PETROL";
+//        this.size       = Size.MEDIUM;
+//    }
+//    public Vehicle(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Size size, Customer customer) {
+//
+//        this.barcode = barcode;
+//        this.model = model;
+//        this.colour = colour;
+//        this.noOfWheels = noOfWheels;
+//        this.noiseLevel = noiseLevel;
+//        this.fuel = fuel;
+//        this.size = size;
+//        this.customer = customer;
+//    }
 
     public String getKey() { return barcode; }
 
@@ -142,45 +157,119 @@ public class Vehicle implements java.io.Serializable { // Comparable<Vehicle>, j
     //@Override
     // public int compareTo(Vehicle o) { return size.compareTo(o.size);
     //}
+
+    public static Builder builder(){ return new Builder();}
+
+    public static class Builder <T> {
+
+        private String   barcode;
+        private String   model = "UNDEFINED";
+        private String   colour= "UNDEFINED";
+        private int      noOfWheels = 4;
+        private int      noiseLevel = 5; // 0-9, 9 highest
+        private String   fuel= "UNDEFINED";
+        private Size     size = Size.MEDIUM;
+        private Customer customer;
+
+        public T withBarcode(String barcode){
+            this.barcode = barcode;
+            return (T)this;
+        }
+
+        public T withModel(String model){
+            this.model = model;
+            return (T)this;
+        }
+
+        public T withColour(String barcolourcode){
+            this.colour = colour;
+            return (T)this;
+        }
+
+        public T withNoOfWheels(int noOfWheels){
+            this.noOfWheels = noOfWheels;
+            return (T)this;
+        }
+
+        public T withNoiseLevel(int noiseLevel){
+            this.noiseLevel = noiseLevel;
+            return (T)this;
+        }
+
+        public T withFuel(String fuel){
+            this.fuel = fuel;
+            return (T)this;
+        }
+
+        public T withSize(Size size){
+            this.size = size;
+            return (T)this;
+        }
+
+        public T withCustomer(Customer customer){
+            this.customer = customer;
+            return (T)this;
+        }
+
+        //public Vehicle build(){
+        //    return new Vehicle(this);
+        //}
+    }
 }
 
 class Mc extends Vehicle {
 
-    public Mc(String barcode, String model, String colour,Customer customer) {
-        super(barcode, model, colour, 2, 7, "PETROL", Size.SMALL, customer);
+    public Mc (Mc.Builder builder) {
+        super(builder);
     }
 
-    public Mc(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
-        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.SMALL, customer);
+    public static class Builder extends Vehicle.Builder <Mc.Builder> {
+        public Mc build(){
+            return new Mc(this);
+        }
     }
+
 }
 
 class Car extends Vehicle {
 
-    public Car(String barcode, String model, String colour,Customer customer) {
-        super(barcode, model, colour, 4, 3, "PETROL", Size.MEDIUM, customer);
+    public static Builder builder(){ return new Builder();}
+
+    public Car (Car.Builder builder) {
+        super(builder);
     }
-    public Car(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
-        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.MEDIUM, customer);
+
+    public static class Builder extends Vehicle.Builder  <Car.Builder> {
+        public Car build(){
+            return new Car(this);
+        }
     }
+
 }
 
 class Truck extends Vehicle {
 
-    public Truck(String barcode, String model, String colour, Customer customer) {
-        super(barcode, model, colour, 4, 6, "DIESEL", Size.LARGE, customer);
+    public Truck (Truck.Builder builder) {
+        super(builder);
     }
-    public Truck(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
-        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.LARGE, customer);
+
+    public static class Builder extends Vehicle.Builder  <Truck.Builder> {
+        public Truck build(){
+            return new Truck(this);
+        }
     }
+
 }
 class Lorry extends Vehicle {
 
-    public Lorry(String barcode, String model, String colour, Customer customer) {
-        super(barcode, model, colour, 4, 7, "DIESEL", Size.LARGE, customer);
+    public Lorry (Lorry.Builder builder) {
+        super(builder);
     }
-    public Lorry(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer) {
-        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.LARGE, customer);
+
+    public static class Builder extends Vehicle.Builder  <Lorry.Builder> {
+        public Lorry build(){
+            return new Lorry(this);
+        }
     }
 }
 
@@ -188,38 +277,57 @@ class Bus extends Vehicle {
 
     int noOfSeats;
 
-    public Bus(String barcode, String model, String colour, Customer customer, int noOfSeats) {
-        super(barcode, model, colour, 8, 7, "DIESEL", Size.HUGE, customer);
-        this.noOfSeats = noOfSeats;
-    }
-
-    public Bus(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer, int noOfSeats) {
-        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.HUGE, customer);
-        this.noOfSeats = noOfSeats;
-    }
-
     public int getNoOfSeats() { return noOfSeats; }
 
     public void setNoOfSeats(int noOfSeats) { this.noOfSeats = noOfSeats; }
+
+    public static Builder builder(){ return new Builder();}
+
+    public Bus (Bus.Builder builder) {
+        super(builder);
+        this.noOfSeats = builder.noOfSeats;
+    }
+    public static class Builder extends Vehicle.Builder  <Bus.Builder>{
+
+        private int noOfSeats;
+
+        public Builder withNoOfSeats(int noOfSeats){
+            this.noOfSeats = noOfSeats;
+            return this;
+        }
+
+        public Bus build(){
+            return new Bus(this);
+        }
+    }
 }
 //Långtradare
 class Juggernaut extends Vehicle {
 
     int noOfBeds;
 
-    public Juggernaut(String barcode, String model, String colour,Customer customer, int noOfBeds) {
-        super(barcode, model, colour, 20, 6, "DIESEL", Size.HUGE, customer);
-        this.noOfBeds = noOfBeds;
-    }
-
-    public Juggernaut(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Customer customer, int noOfBeds) {
-        super(barcode, model, colour, noOfWheels, noiseLevel, fuel, Size.HUGE, customer);
-        this.noOfBeds = noOfBeds;
-    }
-
     public int getNoOfBeds() { return noOfBeds; }
 
     public void setNoOfBeds(int noOfBeds) { this.noOfBeds = noOfBeds; }
+
+    public Juggernaut (Juggernaut.Builder builder) {
+        super(builder);
+        this.noOfBeds = builder.noOfBeds;
+    }
+    public static class Builder extends Vehicle.Builder <Juggernaut.Builder>{
+
+        private int noOfBeds;
+
+        public Builder withNoOfBeds(int noOfBeds){
+            this.noOfBeds = noOfBeds;
+            return this;
+        }
+
+        public Juggernaut build(){
+            return new Juggernaut(this);
+        }
+    }
+
 }
 
 

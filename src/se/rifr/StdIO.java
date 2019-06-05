@@ -38,7 +38,7 @@ public class StdIO
     }
 
     public static void clearScreen() throws IOException, InterruptedException {
-        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        //new ProcessBuilder("echo", "/c", "cls").inheritIO().start().waitFor();
     }
 
     public static class ConsoleColors {

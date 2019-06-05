@@ -15,7 +15,7 @@ public class GarageAdmin {
     //private List<Floor> floorList                    = new ArrayList<>();
     //private List<Garage> garageList                  = new ArrayList<>();
 
-    private String dirName = "C:\\Dev\\GarageAdmin\\";
+    private String dirName = "/var/opt/GarageAdminStorage/";
 
     private String userFile        = dirName + "userlist.ser";
     private String customerFile    = dirName + "customerlist.ser";
@@ -159,25 +159,51 @@ public class GarageAdmin {
         Vehicle vehicle;
         switch (kind.toUpperCase()){
             case "MC" :
-                vehicle = new Mc(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+                vehicle = new Mc.Builder().withBarcode(regNo.toUpperCase()).withColour(colour.toUpperCase())
+                        .withModel(model.toUpperCase()).withCustomer(customer).build();
                 break;
             case "CAR" :
-                vehicle = new Car(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(),customer);
+                vehicle = (new Car.Builder()
+                        .withBarcode(regNo.toUpperCase())
+                        .withModel(model.toUpperCase())
+                        .withColour(colour.toUpperCase())
+                        .withCustomer(customer)).build();
                 break;
             case "TRUCK" :
-                vehicle = new Truck(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+                vehicle = new Truck.Builder()
+                        .withBarcode(regNo.toUpperCase())
+                        .withModel(model.toUpperCase())
+                        .withColour(colour.toUpperCase())
+                        .withCustomer(customer).build();
                 break;
             case "LORRY" :
-                vehicle = new Lorry(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+                vehicle = new Lorry.Builder()
+                        .withBarcode(regNo.toUpperCase())
+                        .withModel(model.toUpperCase())
+                        .withColour(colour.toUpperCase())
+                        .withCustomer(customer).build();
                  break;
             case "BUS" :
-                vehicle = new Bus(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer, 20);
+                vehicle = new Bus.Builder()
+                        .withBarcode(regNo.toUpperCase())
+                        .withModel(model.toUpperCase())
+                        .withColour(colour.toUpperCase())
+                        .withCustomer(customer).build();
                 break;
             case "JUGGERNAUT" :
-                vehicle = new Juggernaut(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer, 0);
+                vehicle = new Juggernaut.Builder()
+                        .withBarcode(regNo.toUpperCase())
+                        .withModel(model.toUpperCase())
+                        .withColour(colour.toUpperCase())
+                        .withCustomer(customer).build();
                 break;
             default:
-                vehicle = new Vehicle(regNo.toUpperCase(), model.toUpperCase(), colour.toUpperCase(), customer);
+                throw new IllegalArgumentException("UNKNOWN VEHICLE TYPE " +kind);
+//                vehicle = new Vehicle.Builder()
+//                        .withBarcode(regNo.toUpperCase())
+//                        .withModel(model.toUpperCase())
+//                        .withColour(colour.toUpperCase())
+//                        .withCustomer(customer).build();
          }
 
         vehicleList.put(vehicle.getKey(),vehicle);
@@ -307,8 +333,16 @@ public class GarageAdmin {
 
                     Customer customer80 = customerList.get("189901011111");
 
-                    Mc    myMc    = new Mc (regNoP0+"000","YAMAHA","RED",2,
-                            7,"Petrol95",customer80);
+                    Mc myMc = new Mc.Builder()
+                            .withBarcode(regNoP0+"000".toUpperCase())
+                            .withModel("YAMAHA")
+                            .withColour("RED")
+                            .withNoOfWheels(2)
+                            .withNoiseLevel(7)
+                            .withFuel("GASOLINE")
+                            .withCustomer(customer80)
+                            .build();
+
                     vehicleList.put(myMc.getKey(),myMc);
 
                     String temp = parkVehicle(myMc,myGarage);
@@ -317,8 +351,16 @@ public class GarageAdmin {
                     else
                         System.out.println("No slot found for "+myMc);
 
-                    Car   myCar   = new Car  (regNoP0+"111","VOLVO XC60","BRAUN",4,
-                            3,"Petrol95",customer80);
+                    Car myCar = new Car.Builder()
+                            .withBarcode(regNoP0+"111".toUpperCase())
+                            .withModel("VOLVO XC60")
+                            .withColour("BRAUN")
+                            .withNoOfWheels(4)
+                            .withNoiseLevel(3)
+                            .withFuel("DIESEL")
+                            .withCustomer(customer80)
+                            .build();
+
                     vehicleList.put(myCar.getKey(),myCar);
 
                     temp = parkVehicle(myCar,myGarage);
@@ -327,8 +369,16 @@ public class GarageAdmin {
                     else
                         System.out.println("No slot found for "+myCar);
 
-                    Truck myTruck = new Truck(regNoP0+"222","VOLVO","BLUE",4,
-                            6,"Petrol95",customer80);
+                    Truck myTruck = new Truck.Builder()
+                            .withBarcode(regNoP0+"222".toUpperCase())
+                            .withModel("VOLVO")
+                            .withColour("BLUE")
+                            .withNoOfWheels(4)
+                            .withNoiseLevel(6)
+                            .withFuel("DIESEL")
+                            .withCustomer(customer80)
+                            .build();
+
                     vehicleList.put(myTruck.getKey(),myTruck);
 
                     temp = parkVehicle(myTruck,myGarage);
@@ -337,8 +387,16 @@ public class GarageAdmin {
                     else
                         System.out.println("No slot found for "+myTruck);
 
-                    Lorry myLorry = new Lorry(regNoP0+"333","VOLVO","GREEN",6,
-                            5,"Petrol95",customer80);
+                    Lorry myLorry = new Lorry.Builder()
+                            .withBarcode(regNoP0+"333".toUpperCase())
+                            .withModel("VOLVO")
+                            .withColour("GREEN")
+                            .withNoOfWheels(6)
+                            .withNoiseLevel(5)
+                            .withFuel("DIESEL")
+                            .withCustomer(customer80)
+                            .build();
+
                     vehicleList.put(myLorry.getKey(),myLorry);
 
                     temp = parkVehicle(myLorry,myGarage);
@@ -347,8 +405,17 @@ public class GarageAdmin {
                     else
                         System.out.println("No slot found for "+myLorry);
 
-                    Juggernaut myJuggernaut = new Juggernaut(regNoP0+"444","VOLVO",
-                            "YELLOW",8,7,"Petrol95",customer80,2);
+                    Juggernaut myJuggernaut = new Juggernaut.Builder()
+                            .withBarcode(regNoP0+"444".toUpperCase())
+                            .withModel("VOLVO")
+                            .withColour("YELLOW")
+                            .withNoOfWheels(8)
+                            .withNoiseLevel(7)
+                            .withFuel("DIESEL")
+                            .withCustomer(customer80)
+                            .withNoOfBeds(2)
+                            .build();
+
                     vehicleList.put(myJuggernaut.getKey(),myJuggernaut);
 
                     temp = parkVehicle(myJuggernaut,myGarage);
@@ -358,6 +425,8 @@ public class GarageAdmin {
                         System.out.println("No slot found for "+myJuggernaut);
 
                     System.out.println("No of free slots "+ countFreeSlotsInTheGarage(myGarage));
+
+                    FileIO.writeObject(vehicleList, vehicleFile);
 
                     break;
 
@@ -524,7 +593,7 @@ public class GarageAdmin {
             StdIO.writeLine("Scan Parking");
 
             StdIO.writeLine("Vehicle barcode");
-            String barcode = StdIO.readLine().trim().toUpperCase();
+            String barcode = StdIO.readLine();
 
             if (vehicleList.containsKey(barcode))
                 vehicle = vehicleList.get(barcode);
@@ -918,7 +987,9 @@ public class GarageAdmin {
                     StdIO.write("No Of Beds: ");
                     int noOfBeds = Integer.valueOf(StdIO.readLine());
 
-                    vehicle = new Juggernaut(regNo, model, colour, noOfWheels, noiseLevel, fuel, customer, noOfBeds);
+                    Juggernaut juggernaut = (Juggernaut)vehicle;
+                    juggernaut.setNoOfBeds(noOfBeds);
+                    vehicleList.put(juggernaut.getKey(),juggernaut);
                     break;
             }
 
