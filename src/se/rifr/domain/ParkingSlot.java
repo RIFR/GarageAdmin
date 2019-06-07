@@ -1,25 +1,30 @@
-package se.rifr;
+package se.rifr.domain;
+
+import se.rifr.StdIO;
+import se.rifr.Str;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Period;
+import java.util.Objects;
 
 public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializable {
 
-    private Garage        garage;
-    private Floor         floor;
+    private Garage garage;
+    private Floor floor;
     private int           placeNo;
-    private Vehicle.Size  size;      // size of the slot
+    private Vehicle.Size size;      // size of the slot
     private double        feePerHour = 0.0d;
     private Vehicle       parked = null;
     private LocalDateTime timeParked;
 
-    public ParkingSlot(Garage garage, Floor floor, int placeNo, Vehicle.Size size, double feePerHour) {
-        this.garage = garage;
-        this.floor = floor;
-        this.placeNo = placeNo;
-        this.size = size;
-        this.feePerHour = feePerHour;
+    public ParkingSlot(ParkingSlot.Builder builder) {
+
+        this.garage     = Objects.requireNonNull(builder.garage);
+        this.floor      = Objects.requireNonNull(builder.floor);
+        this.placeNo    = Objects.requireNonNull(builder.placeNo);
+        this.size       = Objects.requireNonNull(builder.size);
+        this.feePerHour = builder.feePerHour;
+
     }
 
     public String getKey() {
@@ -144,6 +149,47 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         }
 
         return returnString;
+    }
+
+    public static Builder builder(){ return new Builder();}
+
+    public static class Builder {
+
+        private Garage        garage;
+        private Floor         floor;
+        private int           placeNo;
+        private Vehicle.Size  size;      // size of the slot
+        private double        feePerHour = 0.0d;
+
+        public Builder withGarage(Garage garage){
+            this.garage = garage;
+            return this;
+        }
+
+        public Builder withFloor(Floor floor){
+            this.floor = floor;
+            return this;
+        }
+
+        public Builder withPlaceNo(int placeNo){
+            this.placeNo = placeNo;
+            return this;
+        }
+
+        public Builder withSize(Vehicle.Size size){
+            this.size = size;
+            return this;
+        }
+
+        public Builder withFeePerHour(double feePerHour){
+            this.feePerHour = feePerHour;
+            return this;
+        }
+
+        public ParkingSlot build(){
+            return new ParkingSlot(this);
+        }
+
     }
 
 }

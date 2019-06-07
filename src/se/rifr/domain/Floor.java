@@ -1,4 +1,4 @@
-package se.rifr;
+package se.rifr.domain;
 public class Floor implements java.io.Serializable {
 
     private int    level;

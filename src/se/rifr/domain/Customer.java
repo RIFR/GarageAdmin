@@ -1,4 +1,9 @@
-package se.rifr;
+package se.rifr.domain;
+
+import se.rifr.StdIO;
+import se.rifr.Str;
+
+import java.util.Objects;
 
 public class Customer implements java.io.Serializable{
 
@@ -9,14 +14,17 @@ public class Customer implements java.io.Serializable{
     private String telephoneNumber;
     private String userName;
 
-    public Customer(String firstName, String lastName, String barCode, String email, String telephoneNumber, String userName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.barCode = barCode;
-        this.email = email;
-        this.telephoneNumber = telephoneNumber;
-        this.userName = userName;
+    public Customer(Customer.Builder builder) {
+
+        this.firstName       = Objects.requireNonNull(builder.firstName);
+        this.lastName        = Objects.requireNonNull(builder.lastName);
+        this.barCode         = Objects.requireNonNull(builder.barCode);
+        this.email           = builder.email;
+        this.telephoneNumber = builder.telephoneNumber;
+        this.userName        = builder.userName;
+
     }
+
 
     public String getKey() {
         return barCode;
@@ -109,4 +117,49 @@ public class Customer implements java.io.Serializable{
         return returnString;
     }
 
+    public static Builder builder(){ return new Builder();}
+
+    public static class Builder {
+
+        private String firstName;
+        private String lastName;
+        private String barCode;
+        private String email;
+        private String telephoneNumber;
+        private String userName;
+
+        public Builder withFirstName(String firstName){
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder withLastName(String lastName){
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Builder withBarCode(String barCode){
+            this.barCode = barCode;
+            return this;
+        }
+
+        public Builder withemail(String email){
+            this.email = email;
+            return this;
+        }
+
+        public Builder withTelephoneNumber(String telephoneNumber){
+            this.telephoneNumber = telephoneNumber;
+            return this;
+        }
+
+        public Builder withUserName(String userName){
+            this.userName = userName;
+            return this;
+        }
+
+        public Customer build(){
+            return new Customer(this);
+        }
+    }
 }

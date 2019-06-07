@@ -1,4 +1,9 @@
-package se.rifr;
+package se.rifr.domain;
+
+import se.rifr.StdIO;
+import se.rifr.Str;
+
+import java.util.Objects;
 
 public class Account implements java.io.Serializable{
 
@@ -8,15 +13,18 @@ public class Account implements java.io.Serializable{
     private String description;
     private long   parkedTime; // minutes since last payment
 
-    public Account(Customer customer, String bankId, double saldo, String description) {
-        this.customer    = customer;
-        this.bankId      = bankId;
-        this.saldo       = saldo;
-        this.description = description;
+
+    public Account(Account.Builder builder) {
+
+        this.customer    = Objects.requireNonNull(builder.customer);
+        this.bankId      = Objects.requireNonNull(builder.bankId);
+        this.saldo       = builder.saldo;
+        this.description = builder.description;
         this.parkedTime  = 0;
+
     }
 
-    public String getKey() { return customer.getBarCode(); }
+    public String getKey() { return bankId; }
 
     public String getBankId() {
         return bankId;
@@ -105,4 +113,37 @@ public class Account implements java.io.Serializable{
         return returnString;
     }
 
+    public static Builder builder(){ return new Builder();}
+
+    public static class Builder {
+
+        private Customer customer;
+        private String   bankId;
+        private double   saldo;
+        private String   description;
+
+        public Builder withCustomer(Customer customer){
+            this.customer = customer;
+            return this;
+        }
+
+        public Builder withBankId(String bankId){
+            this.bankId = bankId;
+            return this;
+        }
+
+        public Builder withSaldo(double saldo){
+            this.saldo = saldo;
+            return this;
+        }
+
+        public Builder withDescription(String description){
+            this.description = description;
+            return this;
+        }
+
+        public Account build(){
+            return new Account(this);
+        }
+    }
 }

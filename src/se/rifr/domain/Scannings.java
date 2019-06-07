@@ -1,4 +1,7 @@
-package se.rifr;
+package se.rifr.domain;
+
+import se.rifr.StdIO;
+import se.rifr.Str;
 
 import java.time.LocalDateTime;
 

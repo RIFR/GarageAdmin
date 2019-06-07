@@ -1,4 +1,6 @@
 import se.rifr.GarageAdmin;
+import se.rifr.dao.AccountDaoImpl;
+import se.rifr.dao.CustomerDaoImpl;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -9,7 +11,7 @@ import java.io.PrintWriter;
 public class GarageAdminServlet extends HttpServlet {
 
     private String title = "Garage Enter / Leaving";
-    GarageAdmin garageAdmin = new GarageAdmin();
+    GarageAdmin garageAdmin = new GarageAdmin(new AccountDaoImpl(), new CustomerDaoImpl());
 
     String regid    = "";
     String garageid = "";
@@ -127,7 +129,7 @@ public class GarageAdminServlet extends HttpServlet {
         private String vehicleLoginScr() {
 
             String returnStr;
-            returnStr = "<form action = \"GarageAdminServlet\" method = \"GET\">\n";
+            returnStr = "<form action = \"main.java.GarageAdminServlet\" method = \"GET\">\n";
             returnStr += "    <input type = \"hidden\" name = \"pos\" value = \"0\">\n";
             if (!garageid.isEmpty()) {
                 returnStr += "    <input type = \"hidden\" name = \"garageid\" value = \"" + garageid + "\">\n";
@@ -146,7 +148,7 @@ public class GarageAdminServlet extends HttpServlet {
 
         private String getCustomer () {
             String returnStr;
-            returnStr = "<form action = \"GarageAdminServlet\" method = \"GET\">\n";
+            returnStr = "<form action = \"main.java.GarageAdminServlet\" method = \"GET\">\n";
             returnStr += "    <input type = \"hidden\" name = \"pos\" value = \"1\">\n";
             returnStr += "    Customer : <input type = \"text\" name = \"pnr\">\n";
             returnStr += "    <br />";
@@ -163,7 +165,7 @@ public class GarageAdminServlet extends HttpServlet {
         String model  = "";
         String colour = "";
         String returnStr;
-        returnStr = "<form action = \"GarageAdminServlet\" method = \"GET\">\n";
+        returnStr = "<form action = \"main.java.GarageAdminServlet\" method = \"GET\">\n";
         returnStr += "    <input type = \"hidden\" name = \"pos\" value = \"2\">\n";
         returnStr += "    <input type = \"hidden\" name = \"pnr\" value = \"" + pnr + "\">\n";
         returnStr += "    Kind: <input type = \"text\" name = \"kind\" value = \"" + kind + "\">\n";
@@ -186,7 +188,7 @@ public class GarageAdminServlet extends HttpServlet {
         String email       = "";
         String telephoneNo = "";
         String returnStr;
-        returnStr = "<form action = \"GarageAdminServlet\" method = \"GET\">\n";
+        returnStr = "<form action = \"main.java.GarageAdminServlet\" method = \"GET\">\n";
         returnStr += "    <input type = \"hidden\" name = \"pos\" value = \"3\">\n";
         returnStr += "    <input type = \"hidden\" name = \"pnr\" value = \"" + pnr + "\">\n";
         returnStr += " First Name: <input type = \"text\" name = \"firstname\" value = \"" + firstName + "\">\n";
@@ -208,7 +210,7 @@ public class GarageAdminServlet extends HttpServlet {
         private String InfoMenu (String infoLine1, String pos, String hiddenLine1){
 
             String returnStr;
-            returnStr = "<form action = \"GarageAdminServlet\" method = \"GET\">\n";
+            returnStr = "<form action = \"main.java.GarageAdminServlet\" method = \"GET\">\n";
             //returnStr += "    <input type = \"hidden\" name = \"pos\" value = \"m\">\n";
             returnStr += "    <input type = \"hidden\" name = \"pos\" value = \"" + pos + "\">\n";
             if (!hiddenLine1.isEmpty())

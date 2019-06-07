@@ -1,13 +1,20 @@
 package se.rifr;
 
+import se.rifr.domain.*;
+import se.rifr.domain.vehicles.*;
+import se.rifr.dao.*;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class GarageAdmin {
 
+    private final AccountDao  accountDao;
+    private final CustomerDao customerDao;
+
     private Map<String, User> userList = new HashMap<>();
-    private Map<String, Customer> customerList = new HashMap<>();
-    private Map<String, Account> accountList = new HashMap<>();
+    //private Map<String, Customer> customerList = new HashMap<>();
+    //private Map<String, Account> accountList = new HashMap<>();
     private Map<String, Vehicle> vehicleList = new HashMap<>();
     private Map<String, ParkingSlot> parkingSlotList = new HashMap<>();
     private Map<String, Garage> garageList = new HashMap<>();
@@ -26,7 +33,11 @@ public class GarageAdmin {
     private String parkingSlotFile = dirName + "parkingslotlist.ser";
 
 
-    public GarageAdmin() {
+    public GarageAdmin(AccountDao accountDao,
+                       CustomerDao customerDao) {
+
+        this.accountDao  = Objects.requireNonNull(accountDao,"accountDao cannot be null");
+        this.customerDao = Objects.requireNonNull(customerDao,"accountDao cannot be null");
 
         LoadReloadData();
 
@@ -39,8 +50,11 @@ public class GarageAdmin {
 
     public void SaveAllData() {
 
-        if (accountList     != null) FileIO.writeObject(accountList, accountFile);
-        if (customerList    != null) FileIO.writeObject(customerList, customerFile);
+        accountDao.stop();
+        customerDao.stop();
+
+        //if (accountList     != null) FileIO.writeObject(accountList, accountFile);
+        //if (customerList    != null) FileIO.writeObject(customerList, customerFile);
         if (scanningList    != null) FileIO.writeObject(scanningList, scanningFile);
         if (userList        != null) FileIO.writeObject(userList, userFile);
         if (parkingSlotList != null) FileIO.writeObject(parkingSlotList, parkingSlotFile);
@@ -56,13 +70,15 @@ public class GarageAdmin {
             if (tempUserList != null)
                 userList = tempUserList;
 
-            Map<String, Customer> tempCustomerList = FileIO.readObject(customerFile);
-            if (tempCustomerList != null)
-                customerList = tempCustomerList;
+            customerDao.start(customerFile);
+//            Map<String, Customer> tempCustomerList = FileIO.readObject(customerFile);
+//            if (tempCustomerList != null)
+//                customerList = tempCustomerList;
 
-            Map<String, Account> tempAccountList = FileIO.readObject(accountFile);
-            if (tempAccountList != null)
-                accountList = tempAccountList;
+            accountDao.start(accountFile);
+//            Map<String, Account> tempAccountList = FileIO.readObject(accountFile);
+//            if (tempAccountList != null)
+//                accountList = tempAccountList;
 
             Map<String, Vehicle> tempVehicleList = FileIO.readObject(vehicleFile);
             if (tempVehicleList != null)
@@ -127,19 +143,28 @@ public class GarageAdmin {
     }
 
     public boolean customerExists(String customerBarcode) {
-        return customerList.containsKey(customerBarcode.toUpperCase());
+        return customerDao.read(customerBarcode.toUpperCase()).isPresent();
+        //return customerList.containsKey(customerBarcode.toUpperCase());
     }
 
     public Customer getCustomer(String barcode) {
-        return customerList.get(barcode);
+        return customerDao.read(barcode).get();
     }
     public void createCustomer(String firstName,String lastName,String barcode,String email,String telno) {
 
-        Customer customer = new Customer(firstName,lastName,barcode,email,telno,
-                firstName.substring(0,1).toUpperCase()+lastName.substring(0,1).toUpperCase());
+        Customer customer = new Customer.Builder()
+                .withFirstName(firstName)
+                .withLastName(lastName)
+                .withBarCode(barcode)
+                .withemail(email)
+                .withTelephoneNumber(telno)
+                .withUserName(firstName.substring(0,1).toUpperCase()+lastName.substring(0,1).toUpperCase())
+                .build();
 
-        customerList.put(customer.getKey(),customer);
-        FileIO.writeObject(customerList, customerFile);
+        customerDao.maintain(customer);
+
+        //customerList.put(customer.getKey(),customer);
+        //FileIO.writeObject(customerList, customerFile);
     }
 
     public boolean isRegistered(String vehicleBarcode) {
@@ -159,14 +184,19 @@ public class GarageAdmin {
         Vehicle vehicle;
         switch (kind.toUpperCase()){
             case "MC" :
-                vehicle = new Mc.Builder().withBarcode(regNo.toUpperCase()).withColour(colour.toUpperCase())
-                        .withModel(model.toUpperCase()).withCustomer(customer).build();
+                vehicle = new Mc.Builder()
+                        .withBarcode(regNo.toUpperCase())
+                        .withColour(colour.toUpperCase())
+                        .withModel(model.toUpperCase())
+                        .withSize(Vehicle.Size.SMALL)
+                        .withCustomer(customer).build();
                 break;
             case "CAR" :
                 vehicle = (new Car.Builder()
                         .withBarcode(regNo.toUpperCase())
                         .withModel(model.toUpperCase())
                         .withColour(colour.toUpperCase())
+                        .withSize(Vehicle.Size.MEDIUM)
                         .withCustomer(customer)).build();
                 break;
             case "TRUCK" :
@@ -174,6 +204,7 @@ public class GarageAdmin {
                         .withBarcode(regNo.toUpperCase())
                         .withModel(model.toUpperCase())
                         .withColour(colour.toUpperCase())
+                        .withSize(Vehicle.Size.LARGE)
                         .withCustomer(customer).build();
                 break;
             case "LORRY" :
@@ -181,6 +212,7 @@ public class GarageAdmin {
                         .withBarcode(regNo.toUpperCase())
                         .withModel(model.toUpperCase())
                         .withColour(colour.toUpperCase())
+                        .withSize(Vehicle.Size.LARGE)
                         .withCustomer(customer).build();
                  break;
             case "BUS" :
@@ -188,6 +220,7 @@ public class GarageAdmin {
                         .withBarcode(regNo.toUpperCase())
                         .withModel(model.toUpperCase())
                         .withColour(colour.toUpperCase())
+                        .withSize(Vehicle.Size.LARGE)
                         .withCustomer(customer).build();
                 break;
             case "JUGGERNAUT" :
@@ -195,11 +228,12 @@ public class GarageAdmin {
                         .withBarcode(regNo.toUpperCase())
                         .withModel(model.toUpperCase())
                         .withColour(colour.toUpperCase())
+                        .withSize(Vehicle.Size.HUGE)
                         .withCustomer(customer).build();
                 break;
             default:
                 throw new IllegalArgumentException("UNKNOWN VEHICLE TYPE " +kind);
-//                vehicle = new Vehicle.Builder()
+//                vehicles = new Vehicle.Builder()
 //                        .withBarcode(regNo.toUpperCase())
 //                        .withModel(model.toUpperCase())
 //                        .withColour(colour.toUpperCase())
@@ -331,7 +365,7 @@ public class GarageAdmin {
                     System.out.print("Reg Nos (3 char)");
                     String regNoP0 = StdIO.readLine();
 
-                    Customer customer80 = customerList.get("189901011111");
+                    Customer customer80 = customerDao.read("189901011111").get();
 
                     Mc myMc = new Mc.Builder()
                             .withBarcode(regNoP0+"000".toUpperCase())
@@ -340,6 +374,7 @@ public class GarageAdmin {
                             .withNoOfWheels(2)
                             .withNoiseLevel(7)
                             .withFuel("GASOLINE")
+                            .withSize(Vehicle.Size.SMALL)
                             .withCustomer(customer80)
                             .build();
 
@@ -358,6 +393,7 @@ public class GarageAdmin {
                             .withNoOfWheels(4)
                             .withNoiseLevel(3)
                             .withFuel("DIESEL")
+                            .withSize(Vehicle.Size.MEDIUM)
                             .withCustomer(customer80)
                             .build();
 
@@ -376,6 +412,7 @@ public class GarageAdmin {
                             .withNoOfWheels(4)
                             .withNoiseLevel(6)
                             .withFuel("DIESEL")
+                            .withSize(Vehicle.Size.LARGE)
                             .withCustomer(customer80)
                             .build();
 
@@ -394,6 +431,7 @@ public class GarageAdmin {
                             .withNoOfWheels(6)
                             .withNoiseLevel(5)
                             .withFuel("DIESEL")
+                            .withSize(Vehicle.Size.LARGE)
                             .withCustomer(customer80)
                             .build();
 
@@ -412,6 +450,7 @@ public class GarageAdmin {
                             .withNoOfWheels(8)
                             .withNoiseLevel(7)
                             .withFuel("DIESEL")
+                            .withSize(Vehicle.Size.HUGE)
                             .withCustomer(customer80)
                             .withNoOfBeds(2)
                             .build();
@@ -444,29 +483,67 @@ public class GarageAdmin {
                     break;
                 case "88":
 
-                    Customer kalleAnka = new Customer
-                            ("Kalle", "Anka", "189901011111", "kalle.anka@ankeborg.com",
-                                    "+46707155733", "KALLEANKA");
-                    customerList.put(kalleAnka.getKey(), kalleAnka);
+                    Customer kalleAnka = new Customer.Builder()
+                            .withFirstName("Kalle")
+                            .withLastName("Anka")
+                            .withBarCode("189901011111")
+                            .withemail( "kalle.anka@ankeborg.com")
+                            .withTelephoneNumber("+46707155733")
+                            .withUserName("KALLEANKA")
+                            .build();
+
+                    customerDao.maintain(kalleAnka);
+                    //customerList.put(kalleAnka.getKey(), kalleAnka);
 
                     User user = new User(kalleAnka.getFirstName(), kalleAnka.getLastName(), kalleAnka.getBarCode(), kalleAnka.getEmail(), kalleAnka.getUserName(), "KalleAnkaÄrBäst");
                     userList.put(user.getKey(), user);
 
-                    Account account = new Account(kalleAnka, "12345678901234567890", 0.0, "Kalles head account");
-                    accountList.put(account.getKey(), account);
+                    Account account = new Account.Builder()
+                            .withCustomer(kalleAnka)
+                            .withBankId(kalleAnka.getBarCode()+"-1")
+                            .withDescription("Kalle AB current account")
+                            .withSaldo(500.0).build();
+
+                    accountDao.maintain(account);
+                    //accountList.put(account.getKey(), account);
 
                     //----------------------------------------------------------------------------------------
 
                     Garage garage1 = new Garage ("DROTTNINGGATAN 8A","Litet garage");
                     garageList.put(garage1.getKey(), garage1);
                     Floor floor = new Floor(1,"1 bil plats plus två mc platser");
-                    ParkingSlot slotCar1 = new ParkingSlot (garage1,floor,1,Vehicle.Size.MEDIUM,20.0d);
+
+                    ParkingSlot slotCar1 = new ParkingSlot.Builder()
+                            .withGarage(garage1)
+                            .withFloor(floor)
+                            .withPlaceNo(1)
+                            .withSize(Vehicle.Size.MEDIUM)
+                            .withFeePerHour(20.0d)
+                            .build();
+
+                    //ParkingSlot slotCar1 = new ParkingSlot (garage1,floor,1,Vehicle.Size.MEDIUM,20.0d);
                     parkingSlotList.put(slotCar1.getKey(),slotCar1);
 
-                    ParkingSlot slotMc1  = new ParkingSlot (garage1,floor,2,Vehicle.Size.SMALL,5.0d);
+                    ParkingSlot slotMc1 = new ParkingSlot.Builder()
+                            .withGarage(garage1)
+                            .withFloor(floor)
+                            .withPlaceNo(2)
+                            .withSize(Vehicle.Size.SMALL)
+                            .withFeePerHour(5.0d)
+                            .build();
+
+                    //ParkingSlot slotMc1  = new ParkingSlot (garage1,floor,2,Vehicle.Size.SMALL,5.0d);
                     parkingSlotList.put(slotMc1.getKey(),slotMc1);
 
-                    ParkingSlot slotMc2  = new ParkingSlot (garage1,floor,3,Vehicle.Size.SMALL,5.0d);
+                    ParkingSlot slotMc2 = new ParkingSlot.Builder()
+                            .withGarage(garage1)
+                            .withFloor(floor)
+                            .withPlaceNo(3)
+                            .withSize(Vehicle.Size.SMALL)
+                            .withFeePerHour(5.0d)
+                            .build();
+
+                    //ParkingSlot slotMc2  = new ParkingSlot (garage1,floor,3,Vehicle.Size.SMALL,5.0d);
                     parkingSlotList.put(slotMc2.getKey(),slotMc2);
 
                     //----------------------------------------------------------------------------------------
@@ -476,42 +553,131 @@ public class GarageAdmin {
 
                     garageList.put(garage2.getKey(), garage2);
                     Floor floor1 = new Floor(1,"1 bil plats plus två mc platser");
-                    ParkingSlot slotCar21 = new ParkingSlot (garage2,floor1,1,Vehicle.Size.MEDIUM,24.0d);
-                    parkingSlotList.put(slotCar21.getKey(),slotCar21);
 
-                    ParkingSlot slotMc21  = new ParkingSlot (garage2,floor1,2,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slotMc21.getKey(),slotMc21);
+                    ParkingSlot slot11 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor)
+                            .withPlaceNo(1)
+                            .withSize(Vehicle.Size.MEDIUM)
+                            .withFeePerHour(24.0d)
+                            .build();
 
-                    ParkingSlot slotMc22  = new ParkingSlot (garage2,floor1,3,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slotMc22.getKey(),slotMc22);
+                    //ParkingSlot slot11 = new ParkingSlot (garage2,floor1,1,Vehicle.Size.MEDIUM,24.0d);
+                    parkingSlotList.put(slot11.getKey(),slot11);
+
+                    ParkingSlot slot12 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor)
+                            .withPlaceNo(2)
+                            .withSize(Vehicle.Size.SMALL)
+                            .withFeePerHour(6.0d)
+                            .build();
+
+                    //ParkingSlot slot12  = new ParkingSlot (garage2,floor1,2,Vehicle.Size.SMALL,6.0d);
+                    parkingSlotList.put(slot12.getKey(),slot12);
+
+                    ParkingSlot slot13 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor)
+                            .withPlaceNo(3)
+                            .withSize(Vehicle.Size.SMALL)
+                            .withFeePerHour(6.0d)
+                            .build();
+
+                    //ParkingSlot slot13  = new ParkingSlot (garage2,floor1,3,Vehicle.Size.SMALL,6.0d);
+                    parkingSlotList.put(slot13.getKey(),slot13);
 
                     Floor floor2 = new Floor(2,"plats för 3 mc, 2 bil, 1 Truck  platser");
 
-                    ParkingSlot slotMc31  = new ParkingSlot (garage2,floor2,1,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slotMc31.getKey(),slotMc31);
+                    ParkingSlot slot21 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor2)
+                            .withPlaceNo(1)
+                            .withSize(Vehicle.Size.SMALL)
+                            .withFeePerHour(6.0d)
+                            .build();
 
-                    ParkingSlot slotMc32  = new ParkingSlot (garage2,floor2,2,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slotMc32.getKey(),slotMc32);
+                    //ParkingSlot slot21  = new ParkingSlot (garage2,floor2,1,Vehicle.Size.SMALL,6.0d);
+                    parkingSlotList.put(slot21.getKey(),slot21);
 
-                    ParkingSlot slotMc33  = new ParkingSlot (garage2,floor2,3,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slotMc33.getKey(),slotMc33);
+                    ParkingSlot slot22 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor2)
+                            .withPlaceNo(2)
+                            .withSize(Vehicle.Size.SMALL)
+                            .withFeePerHour(6.0d)
+                            .build();
 
-                    ParkingSlot slotMc34  = new ParkingSlot (garage2,floor2,4,Vehicle.Size.MEDIUM,24.0d);
-                    parkingSlotList.put(slotMc34.getKey(),slotMc34);
+                    //ParkingSlot slot22  = new ParkingSlot (garage2,floor2,2,Vehicle.Size.SMALL,6.0d);
+                    parkingSlotList.put(slot22.getKey(),slot22);
 
-                    ParkingSlot slotMc35  = new ParkingSlot (garage2,floor2,5,Vehicle.Size.MEDIUM,24.0d);
-                    parkingSlotList.put(slotMc35.getKey(),slotMc35);
+                    ParkingSlot slot23 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor2)
+                            .withPlaceNo(3)
+                            .withSize(Vehicle.Size.SMALL)
+                            .withFeePerHour(6.0d)
+                            .build();
 
-                    ParkingSlot slotMc36  = new ParkingSlot (garage2,floor2,6,Vehicle.Size.LARGE,48.0d);
-                    parkingSlotList.put(slotMc36.getKey(),slotMc36);
+                    //ParkingSlot slot23  = new ParkingSlot (garage2,floor2,3,Vehicle.Size.SMALL,6.0d);
+                    parkingSlotList.put(slot23.getKey(),slot23);
+
+                    ParkingSlot slot24 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor2)
+                            .withPlaceNo(4)
+                            .withSize(Vehicle.Size.MEDIUM)
+                            .withFeePerHour(24.0d)
+                            .build();
+
+                    //ParkingSlot slot24  = new ParkingSlot (garage2,floor2,4,Vehicle.Size.MEDIUM,24.0d);
+                    parkingSlotList.put(slot24.getKey(),slot24);
+
+                    ParkingSlot slot25 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor2)
+                            .withPlaceNo(5)
+                            .withSize(Vehicle.Size.MEDIUM)
+                            .withFeePerHour(24.0d)
+                            .build();
+
+                    //ParkingSlot slot25  = new ParkingSlot (garage2,floor2,5,Vehicle.Size.MEDIUM,24.0d);
+                    parkingSlotList.put(slot25.getKey(),slot25);
+
+                    ParkingSlot slot26 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor2)
+                            .withPlaceNo(6)
+                            .withSize(Vehicle.Size.LARGE)
+                            .withFeePerHour(48.0d)
+                            .build();
+
+                    //ParkingSlot slot26  = new ParkingSlot (garage2,floor2,6,Vehicle.Size.LARGE,48.0d);
+                    parkingSlotList.put(slot26.getKey(),slot26);
 
                     Floor floor3 = new Floor(3,"plats för 2 långtradare platser");
 
-                    ParkingSlot slotMc41  = new ParkingSlot (garage2,floor3,1,Vehicle.Size.HUGE,96.0d);
-                    parkingSlotList.put(slotMc41.getKey(),slotMc41);
+                    ParkingSlot slot31 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor3)
+                            .withPlaceNo(1)
+                            .withSize(Vehicle.Size.HUGE)
+                            .withFeePerHour(96.0d)
+                            .build();
 
-                    ParkingSlot slotMc42  = new ParkingSlot (garage2,floor3,2,Vehicle.Size.HUGE,96.0d);
-                    parkingSlotList.put(slotMc42.getKey(),slotMc42);
+                    //ParkingSlot slot31  = new ParkingSlot (garage2,floor3,1,Vehicle.Size.HUGE,96.0d);
+                    parkingSlotList.put(slot31.getKey(),slot31);
+
+                    ParkingSlot slot32 = new ParkingSlot.Builder()
+                            .withGarage(garage2)
+                            .withFloor(floor3)
+                            .withPlaceNo(2)
+                            .withSize(Vehicle.Size.HUGE)
+                            .withFeePerHour(96.0d)
+                            .build();
+
+                    //ParkingSlot slot32  = new ParkingSlot (garage2,floor3,2,Vehicle.Size.HUGE,96.0d);
+                    parkingSlotList.put(slot32.getKey(),slot32);
 
                     break;
                 //case "70":
@@ -531,9 +697,10 @@ public class GarageAdmin {
                     System.out.println("");
                     listScannings();
                     System.out.println("");
-                    listGarages();System.out.println("");
-                    listParkingSlots();
+                    listGarages();
                     System.out.println("");
+                    //listParkingSlots();
+                    //System.out.println("");
                     break;
             }
         } catch (Exception e) {
@@ -593,12 +760,12 @@ public class GarageAdmin {
             StdIO.writeLine("Scan Parking");
 
             StdIO.writeLine("Vehicle barcode");
-            String barcode = StdIO.readLine();
+            String barcode = StdIO.readLine().toUpperCase();
 
             if (vehicleList.containsKey(barcode))
                 vehicle = vehicleList.get(barcode);
             else {
-                StdIO.ErrorReport("Unknown vehicle "+barcode);
+                StdIO.ErrorReport("Unknown vehicles "+barcode);
                 return;
             }
 
@@ -607,7 +774,7 @@ public class GarageAdmin {
 
             if (entering) {
                 StdIO.writeLine("Garage name");
-                String garageName = StdIO.readLine();
+                String garageName = StdIO.readLine().toUpperCase();
 
                 if (garageList.containsKey(garageName)) {
                     garage = garageList.get(garageName);
@@ -634,7 +801,19 @@ public class GarageAdmin {
 
      public ParkingSlot park (Vehicle vehicle, Garage inGarage){
 
-        ParkingSlot slot = getNextFree (inGarage,vehicle.getSize());
+         ParkingSlot slot = getSlot (vehicle);
+         if (slot != null) {
+             if (!slot.getGarage().getKey().equals(inGarage.getKey())) {
+                 StdIO.ErrorReport("Ended parking for "+vehicle.getBarcode() +" in "+ slot.getGarage().getName());
+                 unpark (vehicle);
+
+             } else {
+                 StdIO.ErrorReport("Already parked "+vehicle.getBarcode()+" in "+ slot.getGarage().getName());
+                 return null;
+             }
+         }
+
+        slot = getNextFree (inGarage,vehicle.getSize());
         if (slot != null) {
 
             slot.setParked (vehicle);
@@ -668,12 +847,14 @@ public class GarageAdmin {
         parkingSlotList.put(slot.getKey(),slot);
         FileIO.writeObject(parkingSlotList, parkingSlotFile);
 
-        if (accountList.containsKey(vehicle.getCustomer().getBarCode())) {
-            Account account = accountList.get(vehicle.getCustomer().getBarCode());
-            account.updateParkedTime(minutes);
-            account.changeSaldo(slot.getFeePerMinute()*minutes,false);
-            accountList.put(account.getKey(),account);
-            FileIO.writeObject(accountList, accountFile);
+        Optional<Account> optAccount = accountDao.read(vehicle.getCustomer().getBarCode());
+
+         if(optAccount.isPresent()){
+             //Account account =optAccount.get();
+
+             optAccount.get().updateParkedTime(minutes);
+             optAccount.get().changeSaldo(slot.getFeePerMinute()*minutes,false);
+             accountDao.maintain(optAccount.get());
         } else
             System.out.println("The "+vehicle+" was parked for "+minutes+
                     " minutes, since the owner did not have any account he/she need to pay the fee now");
@@ -684,9 +865,10 @@ public class GarageAdmin {
     }
 
     private void listCustomers() {
-        System.out.println(Customer.toStringHeader());
-        if (customerList != null)
-            customerList.forEach((k, v) -> System.out.println(v.toStringLine()));
+        customerDao.printOut();
+//        System.out.println(Customer.toStringHeader());
+//        if (customerList != null)
+//            customerList.forEach((k, v) -> System.out.println(v.toStringLine()));
     }
 
     private void maintainCustomer() {
@@ -710,11 +892,18 @@ public class GarageAdmin {
             StdIO.write("User name : ");
             String userName = StdIO.readLine();
 
-            Customer customer = new Customer(firstName, lastName, barcode, email, telephoneNo, userName);
+            Customer customer = new Customer.Builder()
+                    .withFirstName(firstName)
+                    .withLastName(lastName)
+                    .withBarCode(barcode)
+                    .withemail(email)
+                    .withTelephoneNumber(telephoneNo)
+                    .withUserName(userName)
+                    .build();
 
-            customerList.put(customer.getKey(), customer);
-
-            FileIO.writeObject(customerList, customerFile);
+            customerDao.maintain(customer);
+//            customerList.put(customer.getKey(), customer);
+//            FileIO.writeObject(customerList, customerFile);
 
             updateAccountdWithUpdatedCustomer(customer); // update if exists in accounts
 
@@ -725,15 +914,14 @@ public class GarageAdmin {
     }
 
     private void updateAccountdWithUpdatedCustomer(Customer customer) {
-        for (Account x : accountList.values()) {
+        for (Account x : accountDao.readAllAccounts()) {
             if (x.getCustomer().getKey() == customer.getKey()) {
 
                 x.setCustomer(customer);
-                accountList.put(x.getKey(), x);
+                accountDao.maintain(x);
 
             }
         }
-        FileIO.writeObject(accountList, accountFile);
     }
 
     public void listScannings() {
@@ -745,7 +933,9 @@ public class GarageAdmin {
     public void listUsers() {
         System.out.println(User.toStringHeader());
         if (userList != null)
-            userList.forEach((k, v) -> System.out.println(v.toStringLine()));
+            userList.values().stream()
+                    .filter(item -> !item.getKey().equals("SuperUser"))
+                    .forEach((item -> System.out.println(item.toStringLine())));
     }
 
     private void maintainUsers() {
@@ -783,31 +973,39 @@ public class GarageAdmin {
 
         try {
 
-            Customer customer;
+            //Customer customer;
             StdIO.write("Barcode   : ");
             String barcode = StdIO.readLine().trim();
 
-            if (customerList.containsKey(barcode))
-                customer = customerList.get(barcode);
-            else {
+            Optional<Customer> optCustomer = customerDao.read(barcode);
+            if (!optCustomer.isPresent()) {
                 StdIO.ErrorReport("Unknown Customer " + barcode);
                 return;
             }
 
-            String userName = customer.getUserName();
+//            if (customerList.containsKey(barcode))
+//                customer = customerList.get(barcode);
+//            else {
+//                StdIO.ErrorReport("Unknown Customer " + barcode);
+//                return;
+//            }
+
+            String userName = optCustomer.get().getUserName();
             while (userList.containsKey(userName)) {
-                StdIO.ErrorReport("User Name " + customer.getUserName() + " already exists, enter new");
+                StdIO.ErrorReport("User Name " + optCustomer.get().getUserName() + " already exists, enter new");
                 userName = StdIO.readLine().trim();
             }
 
-            customer.setUserName(userName);
-            customerList.put(customer.getKey(), customer);
-            FileIO.writeObject(customerList, customerFile);
+            optCustomer.get().setUserName(userName);
+            customerDao.maintain(optCustomer.get());
+            //customerList.put(customer.getKey(), customer);
+            //FileIO.writeObject(customerList, customerFile);
 
             StdIO.write("Password   : ");
             String password = StdIO.readLine().trim();
 
-            User user = new User(customer.getFirstName(), customer.getLastName(), customer.getBarCode(), customer.getEmail(), userName, password);
+            User user = new User(optCustomer.get().getFirstName(), optCustomer.get().getLastName(),
+                    optCustomer.get().getBarCode(), optCustomer.get().getEmail(), userName, password);
             userList.put(user.getKey(), user);
             FileIO.writeObject(userList, userFile);
 
@@ -840,16 +1038,17 @@ public class GarageAdmin {
 
 
     private void listAccounts() {
-        System.out.println(Account.toStringHeader());
-        if (accountList != null)
-            accountList.forEach((k, v) -> System.out.println(v.toStringLine()));
+        accountDao.printOut();
+//        System.out.println(Account.toStringHeader());
+//        if (accountList != null)
+//            accountList.forEach((k, v) -> System.out.println(v.toStringLine()));
     }
 
     private void maintainAccounts() {
         Account account;
         double saldo;
         try {
-            Customer customer;
+            //Customer customer;
 
             StdIO.clearScreen();
 
@@ -859,38 +1058,80 @@ public class GarageAdmin {
             StdIO.writeLine("");
             StdIO.writeLine("Customer barcode");
             String barcode = StdIO.readLine();
-            if (customerList.containsKey(barcode))
-                customer = customerList.get(barcode);
-            else {
+
+            Optional<Customer> optCustomer = customerDao.read(barcode);
+
+            if (!optCustomer.isPresent()) {
                 System.out.println("Unknown customer " + barcode);
                 return;
             }
 
+//            if (customerList.containsKey(barcode))
+//                customer = customerList.get(barcode);
+//            else {
+//                System.out.println("Unknown customer " + barcode);
+//                return;
+//            }
+            String accountID = barcode + "-1";
+
             StdIO.writeLine("");
-            StdIO.write("Account Id  : ");
-            String accountID = StdIO.readLine().trim();
+            //StdIO.write("Account Id  : ");
+            //String accountID = StdIO.readLine().trim();
             StdIO.write("Description : ");
             String description = StdIO.readLine();
 
-            if (accountList.containsKey(accountID)) {
-                account = accountList.get(accountID);
-                account.setDescription(description);
-                if (account.getCustomer().getBarCode() != customer.getBarCode()) {
+            Optional<Account> optAccount = accountDao.read(accountID);
+
+            if(optAccount.isPresent()) {
+                if (!optAccount.get().getCustomer().getBarCode().equals(optCustomer.get().getBarCode())) {
                     StdIO.ErrorReport("The customer can not be changed");
                     return;
-                } else
-                    account.setCustomer(customer);
+                }
 
-            } else {
+                optAccount.get().setDescription(description);
+                optAccount.get().setCustomer(optCustomer.get());
+
+                accountDao.maintain(optAccount.get());
+
+            }else {
                 StdIO.write("Saldo       : ");
                 saldo = Double.valueOf(StdIO.readLine());
 
-                account = new Account(customer, accountID, saldo, description);
+                account = new Account.Builder()
+                        .withCustomer(optCustomer.get())
+                        .withBankId(accountID)
+                        .withDescription(description)
+                        .withSaldo(saldo).build();
+
+                accountDao.maintain(account);
             }
 
-            accountList.put(account.getKey(), account);
 
-            FileIO.writeObject(accountList, accountFile);
+
+//             if (accountList.containsKey(accountID)) {
+//                account = accountList.get(accountID);
+//                account.setDescription(description);
+//                if (account.getCustomer().getBarCode() != customer.getBarCode()) {
+//                    StdIO.ErrorReport("The customer can not be changed");
+//                    return;
+//                } else
+//                    account.setCustomer(customer);
+//
+//            } else {
+//                StdIO.write("Saldo       : ");
+//                saldo = Double.valueOf(StdIO.readLine());
+//
+//                account = new Account.Builder()
+//                        .withCustomer(customer)
+//                        .withBankId(accountID)
+//                        .withDescription(description)
+//                        .withSaldo(saldo).build();
+//
+//            }
+//
+//            accountList.put(account.getKey(), account);
+//
+//            FileIO.writeObject(accountList, accountFile);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -917,7 +1158,7 @@ public class GarageAdmin {
         Vehicle vehicle;
         double saldo;
         try {
-            Customer customer;
+            //Customer customer;
 
             StdIO.clearScreen();
 
@@ -927,12 +1168,20 @@ public class GarageAdmin {
             StdIO.writeLine("");
             StdIO.writeLine("Customer barcode");
             String barcode = StdIO.readLine();
-            if (customerList.containsKey(barcode))
-                customer = customerList.get(barcode);
-            else {
+
+            Optional<Customer> optCustomer = customerDao.read(barcode);
+
+            if (!optCustomer.isPresent()) {
                 System.out.println("Unknown customer " + barcode);
                 return;
             }
+
+//            if (customerList.containsKey(barcode))
+//                customer = customerList.get(barcode);
+//            else {
+//                System.out.println("Unknown customer " + barcode);
+//                return;
+//            }
 
             StdIO.writeLine("");
             StdIO.write("Registration Number : ");
@@ -963,7 +1212,7 @@ public class GarageAdmin {
             //Vehicle.Size size = Vehicle.Size.valueOf(StdIO.readLine().toUpperCase());
 
             // Create and store
-            if (!vehicleList.containsKey(regNo)) {createVehicle(regNo, kind, model, colour, customer); }
+            if (!vehicleList.containsKey(regNo)) {createVehicle(regNo, kind, model, colour, optCustomer.get()); }
 
             vehicle = vehicleList.get(regNo);
 
@@ -972,7 +1221,7 @@ public class GarageAdmin {
             vehicle.setNoOfWheels(noOfWheels);
             vehicle.setNoiseLevel(noiseLevel);
             vehicle.setFuel(fuel);
-            vehicle.setCustomer(customer);
+            vehicle.setCustomer(optCustomer.get());
 
             switch (vehicle.getClass().getSimpleName().toUpperCase().trim()) {
                 case "BUS" :
@@ -1186,7 +1435,15 @@ public class GarageAdmin {
 
                 for (int j = 0; j < noOfSlots; j++) {
 
-                    ParkingSlot parkingSlot = new ParkingSlot(garage, floor, i, slotSize, cost);
+                    ParkingSlot parkingSlot = new ParkingSlot.Builder()
+                            .withGarage(garage)
+                            .withFloor(floor)
+                            .withPlaceNo(i)
+                            .withSize(slotSize)
+                            .withFeePerHour(cost)
+                            .build();
+
+                    //ParkingSlot parkingSlot = new ParkingSlot(garage, floor, i, slotSize, cost);
 
                     parkingSlotList.put(parkingSlot.getKey(), parkingSlot);
                 }
@@ -1205,7 +1462,7 @@ public class GarageAdmin {
             StdIO.clearScreen();
 
             StdIO.writeLine("");
-            StdIO.writeLine("Maintain i Parking Slot");
+            StdIO.writeLine("Maintain Parking Slot");
             StdIO.writeLine("");
             StdIO.write("Garage Name : ");
             String name = StdIO.readLine();
