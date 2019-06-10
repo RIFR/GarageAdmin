@@ -1,6 +1,5 @@
 import se.rifr.GarageAdmin;
-import se.rifr.dao.AccountDaoImpl;
-import se.rifr.dao.CustomerDaoImpl;
+import se.rifr.dao.*;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +10,7 @@ import java.io.PrintWriter;
 public class GarageAdminServlet extends HttpServlet {
 
     private String title = "Garage Enter / Leaving";
-    GarageAdmin garageAdmin = new GarageAdmin(new AccountDaoImpl(), new CustomerDaoImpl());
+    GarageAdmin garageAdmin = new GarageAdmin(new UserDaoImpl(), new CustomerDaoImpl(), new AccountDaoImpl(), new VehicleDaoImpl(),new GarageDaoImpl());
 
     String regid    = "";
     String garageid = "";

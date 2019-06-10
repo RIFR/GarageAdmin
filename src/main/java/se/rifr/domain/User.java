@@ -1,33 +1,34 @@
 package se.rifr.domain;
 
-import se.rifr.StdIO;
-import se.rifr.Str;
+import se.rifr.support.StdIO;
+import se.rifr.support.Str;
 
 import java.util.Objects;
 
-public class Customer implements java.io.Serializable{
+public class User implements java.io.Serializable{
 
     private String firstName;
     private String lastName;
-    private String barCode;
+    private String barcode;
     private String email;
-    private String telephoneNumber;
     private String userName;
+    private String password;
 
-    public Customer(Customer.Builder builder) {
 
-        this.firstName       = Objects.requireNonNull(builder.firstName);
-        this.lastName        = Objects.requireNonNull(builder.lastName);
-        this.barCode         = Objects.requireNonNull(builder.barCode);
-        this.email           = builder.email;
-        this.telephoneNumber = builder.telephoneNumber;
-        this.userName        = builder.userName;
+    public User (User.Builder builder) {
+
+        this.firstName = Objects.requireNonNull(builder.firstName);
+        this.lastName  = Objects.requireNonNull(builder.lastName);
+        this.barcode   = Objects.requireNonNull(builder.barcode);
+        this.userName  = Objects.requireNonNull(builder.userName);
+        this.password  = Objects.requireNonNull(builder.password);
+        this.email     = builder.email;
 
     }
 
 
     public String getKey() {
-        return barCode;
+        return userName;
     }
 
     public String getFirstName() {
@@ -46,10 +47,6 @@ public class Customer implements java.io.Serializable{
         this.lastName = lastName;
     }
 
-    public String getFullName() {
-        return firstName + " " + lastName;
-    }
-
     public String getUserName() {
         return userName;
     }
@@ -66,31 +63,31 @@ public class Customer implements java.io.Serializable{
         this.email = email;
     }
 
-    public String getBarCode() {
-        return barCode;
+    public String getPassword() {
+        return password;
     }
 
-    public void setBarCode(String barCode) {
-        this.barCode = barCode;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getTelephoneNumber() {
-        return telephoneNumber;
+    public String getBarcode() {
+        return barcode;
     }
 
-    public void setTelephoneNumber(String telephoneNumber) {
-        this.telephoneNumber = telephoneNumber;
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
     }
 
     @Override
     public String toString() {
-        return "Customer{" +
+        return "User{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", userName='" + userName + '\'' +
+                ", barcode='" + barcode + '\'' +
                 ", email='" + email + '\'' +
-                ", telephoneNo='" + telephoneNumber + '\'' +
-                ", barCode='" + barCode + '\'' +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
                 '}';
     }
 
@@ -100,8 +97,8 @@ public class Customer implements java.io.Serializable{
         returnString += Str.padRight("Lastname",16);
         returnString += Str.padRight("Barcode",14);
         returnString += Str.padRight("email",40);
-        returnString += Str.padRight("telephoneNo",20);
         returnString += Str.padRight("Username",20);
+        returnString += Str.padRight("Password",20);
         returnString += "\r\n" + StdIO.ConsoleColors.BLUE + Str.pad('-',140)+ StdIO.ConsoleColors.RESET;
         return returnString;
     }
@@ -110,10 +107,10 @@ public class Customer implements java.io.Serializable{
         String returnString;
         returnString  = Str.padRight(getFirstName(),16);
         returnString += Str.padRight(getLastName(),16);
-        returnString += Str.padRight(getBarCode(),14);
+        returnString += Str.padRight(getBarcode(),14);
         returnString += Str.padRight(getEmail(),40);
-        returnString += Str.padRight(getTelephoneNumber(),20);
         returnString += Str.padRight(getUserName(),20);
+        returnString += Str.padRight(getPassword(),20);
         return returnString;
     }
 
@@ -123,10 +120,10 @@ public class Customer implements java.io.Serializable{
 
         private String firstName;
         private String lastName;
-        private String barCode;
+        private String barcode;
         private String email;
-        private String telephoneNumber;
         private String userName;
+        private String password;
 
         public Builder withFirstName(String firstName){
             this.firstName = firstName;
@@ -138,8 +135,8 @@ public class Customer implements java.io.Serializable{
             return this;
         }
 
-        public Builder withBarCode(String barCode){
-            this.barCode = barCode;
+        public Builder withBarCode(String barcode){
+            this.barcode = barcode;
             return this;
         }
 
@@ -148,18 +145,20 @@ public class Customer implements java.io.Serializable{
             return this;
         }
 
-        public Builder withTelephoneNumber(String telephoneNumber){
-            this.telephoneNumber = telephoneNumber;
-            return this;
-        }
-
         public Builder withUserName(String userName){
             this.userName = userName;
             return this;
         }
 
-        public Customer build(){
-            return new Customer(this);
+        public Builder withPassword(String password){
+            this.password = password;
+            return this;
         }
+
+        public User build(){
+            return new User(this);
+        }
+
     }
+
 }

@@ -1,6 +1,6 @@
 package se.rifr.dao;
 
-import se.rifr.FileIO;
+import se.rifr.support.FileIO;
 import se.rifr.domain.Account;
 
 import java.util.Collection;
@@ -20,6 +20,13 @@ public class AccountDaoImpl implements AccountDao{
         accounts.put(account.getKey(),account);
         FileIO.writeObject(accounts, fileName);
     }
+
+    @Override
+    public void delete(Account account) {
+        accounts.remove(account);
+        FileIO.writeObject(accounts, fileName);
+    }
+
 
     @Override
     public Optional<Account> read(String key) {

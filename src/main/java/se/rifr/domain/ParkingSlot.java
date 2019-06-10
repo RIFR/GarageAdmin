@@ -1,7 +1,7 @@
 package se.rifr.domain;
 
-import se.rifr.StdIO;
-import se.rifr.Str;
+import se.rifr.support.StdIO;
+import se.rifr.support.Str;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

@@ -1,13 +1,13 @@
 package se.rifr;
 
-import se.rifr.dao.AccountDaoImpl;
-import se.rifr.dao.CustomerDaoImpl;
+import se.rifr.dao.*;
 
 public class Main {
 
     public static void main(String args[]) {
 	    GarageAdmin garageAdmin = new GarageAdmin
-                (new AccountDaoImpl(),new CustomerDaoImpl());
+                (new UserDaoImpl(),new CustomerDaoImpl(),new AccountDaoImpl(),new VehicleDaoImpl(),new GarageDaoImpl());
+
 	    garageAdmin.start();
     }
 }

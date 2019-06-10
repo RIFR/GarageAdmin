@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface AccountDao {
 
     void maintain(Account account);
+    void delete(Account account);
 
     Optional<Account> read(String key);
 

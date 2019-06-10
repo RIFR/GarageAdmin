@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface CustomerDao {
 
     void maintain(Customer Customer);
+    void delete(Customer Customer);
 
     Optional<Customer> read(String key);
 

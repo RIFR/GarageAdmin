@@ -1,4 +1,4 @@
-package se.rifr;
+package se.rifr.support;
 
 public class Str {
 

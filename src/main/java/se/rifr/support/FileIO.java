@@ -1,4 +1,4 @@
-package se.rifr;
+package se.rifr.support;
 
 import java.io.IOException;
 import java.io.*;

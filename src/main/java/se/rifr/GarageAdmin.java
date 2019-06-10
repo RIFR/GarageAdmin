@@ -3,21 +3,26 @@ package se.rifr;
 import se.rifr.domain.*;
 import se.rifr.domain.vehicles.*;
 import se.rifr.dao.*;
+import se.rifr.support.FileIO;
+import se.rifr.support.StdIO;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class GarageAdmin {
 
-    private final AccountDao  accountDao;
+    private final UserDao     userDao;
     private final CustomerDao customerDao;
+    private final AccountDao  accountDao;
+    private final VehicleDao  vehicleDao;
+    private final GarageDao   garageDao;
 
-    private Map<String, User> userList = new HashMap<>();
+    //private Map<String, User> userList = new HashMap<>();
     //private Map<String, Customer> customerList = new HashMap<>();
     //private Map<String, Account> accountList = new HashMap<>();
-    private Map<String, Vehicle> vehicleList = new HashMap<>();
+    //private Map<String, Vehicle> vehicleList = new HashMap<>();
     private Map<String, ParkingSlot> parkingSlotList = new HashMap<>();
-    private Map<String, Garage> garageList = new HashMap<>();
+    //private Map<String, Garage> garageList = new HashMap<>();
     private List<Scannings> scanningList = new ArrayList<>();
     //private List<Floor> floorList                    = new ArrayList<>();
     //private List<Garage> garageList                  = new ArrayList<>();
@@ -33,42 +38,52 @@ public class GarageAdmin {
     private String parkingSlotFile = dirName + "parkingslotlist.ser";
 
 
-    public GarageAdmin(AccountDao accountDao,
-                       CustomerDao customerDao) {
+    public GarageAdmin(UserDao userDao,
+                       CustomerDao customerDao,
+                       AccountDao accountDao,
+                       VehicleDao vehicleDao,
+                       GarageDao garageDao) {
 
+        this.userDao     = Objects.requireNonNull(userDao,"userDao cannot be null");
+        this.customerDao = Objects.requireNonNull(customerDao,"customerDao cannot be null");
         this.accountDao  = Objects.requireNonNull(accountDao,"accountDao cannot be null");
-        this.customerDao = Objects.requireNonNull(customerDao,"accountDao cannot be null");
+        this.vehicleDao  = Objects.requireNonNull(vehicleDao,"vehicleDao cannot be null");
+        this.garageDao   = Objects.requireNonNull(garageDao,"garageDao cannot be null");
 
         LoadReloadData();
 
-        //if (userList == null) {
-        User user = new User("Super", "User", "007", "admin@mybank.se", "SuperUser", "SuperUser");
-        userList.put(user.getKey(), user);
-        //FileIO.writeObject(userList, userFile);
-        //}
     }
 
     public void SaveAllData() {
 
-        accountDao.stop();
-        customerDao.stop();
+        userDao.stop();
+        //if (userList        != null) FileIO.writeObject(userList, userFile);
 
-        //if (accountList     != null) FileIO.writeObject(accountList, accountFile);
+        customerDao.stop();
         //if (customerList    != null) FileIO.writeObject(customerList, customerFile);
-        if (scanningList    != null) FileIO.writeObject(scanningList, scanningFile);
-        if (userList        != null) FileIO.writeObject(userList, userFile);
+
+        accountDao.stop();
+        //if (accountList     != null) FileIO.writeObject(accountList, accountFile);
+
+        vehicleDao.stop();
+        //if (vehicleList     != null) FileIO.writeObject(vehicleList, vehicleFile);
+
+        garageDao.stop();
+        //if (garageList      != null) FileIO.writeObject(garageList, garageFile);
+
         if (parkingSlotList != null) FileIO.writeObject(parkingSlotList, parkingSlotFile);
-        if (garageList      != null) FileIO.writeObject(garageList, garageFile);
-        if (vehicleList     != null) FileIO.writeObject(vehicleList, vehicleFile);
+
+        if (scanningList    != null) FileIO.writeObject(scanningList, scanningFile);
 
     }
 
     public void LoadReloadData() {
 
         try {
-            Map<String, User> tempUserList = FileIO.readObject(userFile);
-            if (tempUserList != null)
-                userList = tempUserList;
+            userDao.start(userFile);
+//            Map<String, User> tempUserList = FileIO.readObject(userFile);
+//            if (tempUserList != null)
+//                userList = tempUserList;
 
             customerDao.start(customerFile);
 //            Map<String, Customer> tempCustomerList = FileIO.readObject(customerFile);
@@ -80,9 +95,15 @@ public class GarageAdmin {
 //            if (tempAccountList != null)
 //                accountList = tempAccountList;
 
-            Map<String, Vehicle> tempVehicleList = FileIO.readObject(vehicleFile);
-            if (tempVehicleList != null)
-                vehicleList = tempVehicleList;
+            vehicleDao.start(vehicleFile);
+//            Map<String, Vehicle> tempVehicleList = FileIO.readObject(vehicleFile);
+//            if (tempVehicleList != null)
+//                vehicleList = tempVehicleList;
+
+            garageDao.start(garageFile);
+            //Map<String, Garage> tempGarageList= FileIO.readObject(garageFile);
+            //if (tempGarageList != null)
+            //    garageList = tempGarageList;
 
             Map<String, ParkingSlot> tempParkingSlotList = FileIO.readObject(parkingSlotFile);
             if (tempParkingSlotList != null)
@@ -91,14 +112,6 @@ public class GarageAdmin {
             List<Scannings> tempScanningList = FileIO.readObject(scanningFile);
             if (tempScanningList != null)
                 scanningList = tempScanningList;
-
-            Map<String, Garage> tempGarageList= FileIO.readObject(garageFile);
-            if (tempGarageList != null)
-                garageList = tempGarageList;
-
-            //List<Floor> tempFloorList= FileIO.readObject(floorFile);
-            //if (tempFloorList != null)
-            //    floorList = tempFloorList;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,12 +148,11 @@ public class GarageAdmin {
     }
 
     public boolean loginOk(String username, String password) {
-        return userList.containsKey(username) && userList.get(username).getPassword().equals(password);
+        return userDao.read(username).isPresent() && userDao.read(username).get().getPassword().equals(password);
     }
-
-    public boolean garageExists(String name) {
-        return (garageList.containsKey(name.toUpperCase()));
-    }
+//    public boolean loginOk(String username, String password) {
+//        return userList.containsKey(username) && userList.get(username).getPassword().equals(password);
+//    }
 
     public boolean customerExists(String customerBarcode) {
         return customerDao.read(customerBarcode.toUpperCase()).isPresent();
@@ -168,15 +180,15 @@ public class GarageAdmin {
     }
 
     public boolean isRegistered(String vehicleBarcode) {
-         return vehicleList.containsKey(vehicleBarcode);
+         return vehicleDao.read(vehicleBarcode.toUpperCase()).isPresent();
     }
 
     public boolean isParked(String vehicleBarcode) {
-        return isRegistered(vehicleBarcode) && getSlot (vehicleList.get(vehicleBarcode.toUpperCase()))!= null;
+        return isRegistered(vehicleBarcode) && getSlot (vehicleDao.read(vehicleBarcode.toUpperCase()).get())!= null;
     }
 
     public Vehicle getVehicle(String vehicleBarcode) {
-        if (vehicleList.containsKey(vehicleBarcode)) return vehicleList.get(vehicleBarcode);
+        if (isRegistered(vehicleBarcode)) return vehicleDao.read(vehicleBarcode.toUpperCase()).get();
         else throw new IllegalArgumentException("Vehicle "+vehicleBarcode+" not found");
     }
 
@@ -240,8 +252,7 @@ public class GarageAdmin {
 //                        .withCustomer(customer).build();
          }
 
-        vehicleList.put(vehicle.getKey(),vehicle);
-        FileIO.writeObject(vehicleList, vehicleFile);
+         vehicleDao.maintain(vehicle);
 
     }
 
@@ -273,10 +284,18 @@ public class GarageAdmin {
         } else return "";
     }
 
-    public Garage getGarage(String name) {
-        if (garageList.containsKey(name)) return garageList.get(name);
-        else throw new IllegalArgumentException("Garage "+name+" not found");
+    public boolean garageExists(String name) {
+        return (garageDao.read(name.toUpperCase())).isPresent();
     }
+    //public boolean garageExists(String name) { return (garageList.containsKey(name.toUpperCase()));}
+
+    public Garage getGarage(String name) {
+        return garageDao.read(name.toUpperCase()).get();
+    }
+//    public Garage getGarage(String name) {
+//        if (garageList.containsKey(name)) return garageList.get(name);
+//        else throw new IllegalArgumentException("Garage "+name+" not found");
+//    }
 
     public void start() {
 
@@ -358,7 +377,8 @@ public class GarageAdmin {
                 case "80":
 
                     System.out.print("Garage name? (A/B)");
-                    Garage myGarage = garageList.get("DROTTNINGGATAN 8"+StdIO.readLine().toUpperCase());
+                    Garage myGarage = garageDao.read("DROTTNINGGATAN 8"+StdIO.readLine().toUpperCase()).get();
+                    //Garage myGarage = garageList.get("DROTTNINGGATAN 8"+StdIO.readLine().toUpperCase());
 
                     System.out.println("No of free slots "+ countFreeSlotsInTheGarage(myGarage));
 
@@ -378,7 +398,7 @@ public class GarageAdmin {
                             .withCustomer(customer80)
                             .build();
 
-                    vehicleList.put(myMc.getKey(),myMc);
+                    vehicleDao.maintain(myMc);
 
                     String temp = parkVehicle(myMc,myGarage);
                     if (!temp.isEmpty())
@@ -397,7 +417,7 @@ public class GarageAdmin {
                             .withCustomer(customer80)
                             .build();
 
-                    vehicleList.put(myCar.getKey(),myCar);
+                    vehicleDao.maintain(myCar);
 
                     temp = parkVehicle(myCar,myGarage);
                     if (!temp.isEmpty())
@@ -416,7 +436,7 @@ public class GarageAdmin {
                             .withCustomer(customer80)
                             .build();
 
-                    vehicleList.put(myTruck.getKey(),myTruck);
+                    vehicleDao.maintain(myTruck);
 
                     temp = parkVehicle(myTruck,myGarage);
                     if (!temp.isEmpty())
@@ -435,7 +455,7 @@ public class GarageAdmin {
                             .withCustomer(customer80)
                             .build();
 
-                    vehicleList.put(myLorry.getKey(),myLorry);
+                    vehicleDao.maintain(myLorry);
 
                     temp = parkVehicle(myLorry,myGarage);
                     if (!temp.isEmpty())
@@ -455,7 +475,7 @@ public class GarageAdmin {
                             .withNoOfBeds(2)
                             .build();
 
-                    vehicleList.put(myJuggernaut.getKey(),myJuggernaut);
+                    vehicleDao.maintain(myJuggernaut);
 
                     temp = parkVehicle(myJuggernaut,myGarage);
                     if (!temp.isEmpty())
@@ -465,8 +485,6 @@ public class GarageAdmin {
 
                     System.out.println("No of free slots "+ countFreeSlotsInTheGarage(myGarage));
 
-                    FileIO.writeObject(vehicleList, vehicleFile);
-
                     break;
 
                 case "81":
@@ -474,11 +492,11 @@ public class GarageAdmin {
                     System.out.print("Reg Nos (3 char)");
                     String regNoP1 = StdIO.readLine();
 
-                    unparkVehicle(vehicleList.get(regNoP1+"000"));
-                    unparkVehicle(vehicleList.get(regNoP1+"111"));
-                    unparkVehicle(vehicleList.get(regNoP1+"222"));
-                    unparkVehicle(vehicleList.get(regNoP1+"333"));
-                    unparkVehicle(vehicleList.get(regNoP1+"444"));
+                    unparkVehicle(vehicleDao.read(regNoP1+"000").get());
+                    unparkVehicle(vehicleDao.read(regNoP1+"111").get());
+                    unparkVehicle(vehicleDao.read(regNoP1+"222").get());
+                    unparkVehicle(vehicleDao.read(regNoP1+"333").get());
+                    unparkVehicle(vehicleDao.read(regNoP1+"444").get());
 
                     break;
                 case "88":
@@ -493,10 +511,16 @@ public class GarageAdmin {
                             .build();
 
                     customerDao.maintain(kalleAnka);
-                    //customerList.put(kalleAnka.getKey(), kalleAnka);
 
-                    User user = new User(kalleAnka.getFirstName(), kalleAnka.getLastName(), kalleAnka.getBarCode(), kalleAnka.getEmail(), kalleAnka.getUserName(), "KalleAnkaÄrBäst");
-                    userList.put(user.getKey(), user);
+                    User user = new User.Builder()
+                            .withFirstName(kalleAnka.getFirstName())
+                            .withLastName(kalleAnka.getLastName())
+                            .withBarCode(kalleAnka.getBarCode())
+                            .withemail(kalleAnka.getEmail())
+                            .withUserName(kalleAnka.getUserName())
+                            .withPassword("KalleAnkaÄrBäst").build();
+
+                    userDao.maintain(user);
 
                     Account account = new Account.Builder()
                             .withCustomer(kalleAnka)
@@ -505,12 +529,12 @@ public class GarageAdmin {
                             .withSaldo(500.0).build();
 
                     accountDao.maintain(account);
-                    //accountList.put(account.getKey(), account);
 
                     //----------------------------------------------------------------------------------------
 
                     Garage garage1 = new Garage ("DROTTNINGGATAN 8A","Litet garage");
-                    garageList.put(garage1.getKey(), garage1);
+                    garageDao.maintain(garage1);
+
                     Floor floor = new Floor(1,"1 bil plats plus två mc platser");
 
                     ParkingSlot slotCar1 = new ParkingSlot.Builder()
@@ -521,7 +545,6 @@ public class GarageAdmin {
                             .withFeePerHour(20.0d)
                             .build();
 
-                    //ParkingSlot slotCar1 = new ParkingSlot (garage1,floor,1,Vehicle.Size.MEDIUM,20.0d);
                     parkingSlotList.put(slotCar1.getKey(),slotCar1);
 
                     ParkingSlot slotMc1 = new ParkingSlot.Builder()
@@ -532,7 +555,6 @@ public class GarageAdmin {
                             .withFeePerHour(5.0d)
                             .build();
 
-                    //ParkingSlot slotMc1  = new ParkingSlot (garage1,floor,2,Vehicle.Size.SMALL,5.0d);
                     parkingSlotList.put(slotMc1.getKey(),slotMc1);
 
                     ParkingSlot slotMc2 = new ParkingSlot.Builder()
@@ -543,20 +565,19 @@ public class GarageAdmin {
                             .withFeePerHour(5.0d)
                             .build();
 
-                    //ParkingSlot slotMc2  = new ParkingSlot (garage1,floor,3,Vehicle.Size.SMALL,5.0d);
                     parkingSlotList.put(slotMc2.getKey(),slotMc2);
 
                     //----------------------------------------------------------------------------------------
 
                     Garage garage2 = new Garage
                             ("DROTTNINGGATAN 8B","Lite större garage, tre våningsplan");
+                    garageDao.maintain(garage2);
 
-                    garageList.put(garage2.getKey(), garage2);
                     Floor floor1 = new Floor(1,"1 bil plats plus två mc platser");
 
                     ParkingSlot slot11 = new ParkingSlot.Builder()
                             .withGarage(garage2)
-                            .withFloor(floor)
+                            .withFloor(floor1)
                             .withPlaceNo(1)
                             .withSize(Vehicle.Size.MEDIUM)
                             .withFeePerHour(24.0d)
@@ -567,7 +588,7 @@ public class GarageAdmin {
 
                     ParkingSlot slot12 = new ParkingSlot.Builder()
                             .withGarage(garage2)
-                            .withFloor(floor)
+                            .withFloor(floor1)
                             .withPlaceNo(2)
                             .withSize(Vehicle.Size.SMALL)
                             .withFeePerHour(6.0d)
@@ -578,7 +599,7 @@ public class GarageAdmin {
 
                     ParkingSlot slot13 = new ParkingSlot.Builder()
                             .withGarage(garage2)
-                            .withFloor(floor)
+                            .withFloor(floor1)
                             .withPlaceNo(3)
                             .withSize(Vehicle.Size.SMALL)
                             .withFeePerHour(6.0d)
@@ -752,7 +773,7 @@ public class GarageAdmin {
     }
 
     private void scanParking() {
-        Vehicle vehicle;
+        //Vehicle vehicle;
         Garage garage;
         boolean entering;
         try {
@@ -762,9 +783,8 @@ public class GarageAdmin {
             StdIO.writeLine("Vehicle barcode");
             String barcode = StdIO.readLine().toUpperCase();
 
-            if (vehicleList.containsKey(barcode))
-                vehicle = vehicleList.get(barcode);
-            else {
+            Optional <Vehicle> optVehicle = vehicleDao.read(barcode);
+            if (!optVehicle.isPresent()) {
                 StdIO.ErrorReport("Unknown vehicles "+barcode);
                 return;
             }
@@ -776,20 +796,21 @@ public class GarageAdmin {
                 StdIO.writeLine("Garage name");
                 String garageName = StdIO.readLine().toUpperCase();
 
-                if (garageList.containsKey(garageName)) {
-                    garage = garageList.get(garageName);
-                    park(vehicle,garage);
+                Optional<Garage> optGarage = garageDao.read(garageName);
+                if (optGarage.isPresent()) {
+                    garage = optGarage.get();
+                    park(optVehicle.get(),garage);
                 } else {
                     StdIO.ErrorReport("Unknown garage "+garageName);
                     return;
                 }
             }else {
-                ParkingSlot slot = unpark(vehicle);
+                ParkingSlot slot = unpark(optVehicle.get());
                 garage = slot.getGarage();
             }
 
             // Store the updated scanning
-            Scannings scanning = new Scannings(vehicle, LocalDateTime.now(), entering, garage);
+            Scannings scanning = new Scannings(optVehicle.get(), LocalDateTime.now(), entering, garage);
             scanningList.add(scanning);
             FileIO.writeObject(scanningList, scanningFile);
 
@@ -931,11 +952,12 @@ public class GarageAdmin {
     }
 
     public void listUsers() {
-        System.out.println(User.toStringHeader());
-        if (userList != null)
-            userList.values().stream()
-                    .filter(item -> !item.getKey().equals("SuperUser"))
-                    .forEach((item -> System.out.println(item.toStringLine())));
+        userDao.printOut();
+//        System.out.println(User.toStringHeader());
+//        if (userList != null)
+//            userList.values().stream()
+//                    .filter(item -> !item.getKey().equals("SuperUser"))
+//                    .forEach((item -> System.out.println(item.toStringLine())));
     }
 
     private void maintainUsers() {
@@ -957,11 +979,14 @@ public class GarageAdmin {
             String userName = StdIO.readLine();
             StdIO.write("Password  : ");
             String password = StdIO.readLine();
-            User user = new User(firstName, lastName, barcode, email, userName, password);
 
-            userList.put(user.getKey(), user);
-
-            FileIO.writeObject(userList, userFile);
+            userDao.maintain(new User.Builder()
+                    .withFirstName(firstName)
+                    .withLastName(lastName)
+                    .withBarCode(barcode)
+                    .withemail(email)
+                    .withUserName(userName)
+                    .withPassword(password).build());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -973,7 +998,6 @@ public class GarageAdmin {
 
         try {
 
-            //Customer customer;
             StdIO.write("Barcode   : ");
             String barcode = StdIO.readLine().trim();
 
@@ -983,31 +1007,25 @@ public class GarageAdmin {
                 return;
             }
 
-//            if (customerList.containsKey(barcode))
-//                customer = customerList.get(barcode);
-//            else {
-//                StdIO.ErrorReport("Unknown Customer " + barcode);
-//                return;
-//            }
-
             String userName = optCustomer.get().getUserName();
-            while (userList.containsKey(userName)) {
+            while (userDao.read(userName).isPresent()) {
                 StdIO.ErrorReport("User Name " + optCustomer.get().getUserName() + " already exists, enter new");
                 userName = StdIO.readLine().trim();
             }
 
             optCustomer.get().setUserName(userName);
             customerDao.maintain(optCustomer.get());
-            //customerList.put(customer.getKey(), customer);
-            //FileIO.writeObject(customerList, customerFile);
 
             StdIO.write("Password   : ");
             String password = StdIO.readLine().trim();
 
-            User user = new User(optCustomer.get().getFirstName(), optCustomer.get().getLastName(),
-                    optCustomer.get().getBarCode(), optCustomer.get().getEmail(), userName, password);
-            userList.put(user.getKey(), user);
-            FileIO.writeObject(userList, userFile);
+            userDao.maintain(new User.Builder()
+                    .withFirstName(optCustomer.get().getFirstName())
+                    .withLastName(optCustomer.get().getLastName())
+                    .withBarCode(optCustomer.get().getBarCode())
+                    .withemail(optCustomer.get().getEmail())
+                    .withUserName(optCustomer.get().getUserName())
+                    .withPassword(password).build());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1018,17 +1036,18 @@ public class GarageAdmin {
     private void deleteUser() {
         try {
             StdIO.write("User Name : ");
-            String userName = StdIO.readLine();
-            if (userList.containsKey(userName)) {
-                User user = userList.get(userName);
+            String userName = StdIO.readLine().toUpperCase();
+
+            Optional <User> optUser = userDao.read(userName);
+
+            if (optUser.isPresent()) {
                 StdIO.writeLine("Confirm deletion for "
-                        + user.getFirstName() + " " + user.getLastName() + " " + user.getBarcode() + "(y/n)");
+                        + optUser.get().getFirstName() + " " + optUser.get().getLastName() + " " + optUser.get().getBarcode() + "(y/n)");
                 if (StdIO.readYesOrNo()) {
-                    userList.remove(userName);
-                    FileIO.writeObject(userList, userFile);
+                    userDao.delete(optUser.get());
                 }
             } else
-                StdIO.ErrorReport("Unknown User Name");
+                StdIO.ErrorReport("Unknown User "+userName);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1039,9 +1058,6 @@ public class GarageAdmin {
 
     private void listAccounts() {
         accountDao.printOut();
-//        System.out.println(Account.toStringHeader());
-//        if (accountList != null)
-//            accountList.forEach((k, v) -> System.out.println(v.toStringLine()));
     }
 
     private void maintainAccounts() {
@@ -1066,12 +1082,6 @@ public class GarageAdmin {
                 return;
             }
 
-//            if (customerList.containsKey(barcode))
-//                customer = customerList.get(barcode);
-//            else {
-//                System.out.println("Unknown customer " + barcode);
-//                return;
-//            }
             String accountID = barcode + "-1";
 
             StdIO.writeLine("");
@@ -1106,59 +1116,18 @@ public class GarageAdmin {
                 accountDao.maintain(account);
             }
 
-
-
-//             if (accountList.containsKey(accountID)) {
-//                account = accountList.get(accountID);
-//                account.setDescription(description);
-//                if (account.getCustomer().getBarCode() != customer.getBarCode()) {
-//                    StdIO.ErrorReport("The customer can not be changed");
-//                    return;
-//                } else
-//                    account.setCustomer(customer);
-//
-//            } else {
-//                StdIO.write("Saldo       : ");
-//                saldo = Double.valueOf(StdIO.readLine());
-//
-//                account = new Account.Builder()
-//                        .withCustomer(customer)
-//                        .withBankId(accountID)
-//                        .withDescription(description)
-//                        .withSaldo(saldo).build();
-//
-//            }
-//
-//            accountList.put(account.getKey(), account);
-//
-//            FileIO.writeObject(accountList, accountFile);
-
         } catch (Exception e) {
             e.printStackTrace();
             StdIO.ErrorReport("Exception -" + e.toString());
         }
     }
 
-    public void listVehicles() {
-        System.out.println(Vehicle.toStringHeader());
-        if (vehicleList != null) {
-            vehicleList.values().stream()
-                    .sorted(Comparator.comparing(item -> item.getSize()))
-                    .sorted(Comparator.comparing(item -> item.getBarcode()))
-                    .sorted(Comparator.comparing(item -> item.getCustomer().getFullName()))
-                    .forEach(item -> System.out.println(item.toStringLine()));
-
-            //for (Vehicle x : vehicleList.values() )
-            //    System.out.println(x.toStringLine());
-            //vehicleList.forEach((k, v) -> System.out.println(v.toStringLine()));
-        }
-    }
+    public void listVehicles() { vehicleDao.printOut(); }
 
     private void maintainVehicles() {
         Vehicle vehicle;
         double saldo;
         try {
-            //Customer customer;
 
             StdIO.clearScreen();
 
@@ -1175,13 +1144,6 @@ public class GarageAdmin {
                 System.out.println("Unknown customer " + barcode);
                 return;
             }
-
-//            if (customerList.containsKey(barcode))
-//                customer = customerList.get(barcode);
-//            else {
-//                System.out.println("Unknown customer " + barcode);
-//                return;
-//            }
 
             StdIO.writeLine("");
             StdIO.write("Registration Number : ");
@@ -1205,16 +1167,10 @@ public class GarageAdmin {
             StdIO.write("CLASS (MC,CAR,TRUCK,LORRY,BUS,JUGGERNAUT): ");
             String kind = StdIO.readLine().toUpperCase();
 
-            //StdIO.write("Size ( ");
-            //for (Vehicle.Size size : Vehicle.Size.values())
-            //    StdIO.write(size.toString() + " ");
-            //StdIO.write("): ");
-            //Vehicle.Size size = Vehicle.Size.valueOf(StdIO.readLine().toUpperCase());
-
             // Create and store
-            if (!vehicleList.containsKey(regNo)) {createVehicle(regNo, kind, model, colour, optCustomer.get()); }
+            if (!vehicleDao.read(regNo).isPresent()) {createVehicle(regNo, kind, model, colour, optCustomer.get()); }
 
-            vehicle = vehicleList.get(regNo);
+            vehicle = vehicleDao.read(regNo).get();
 
             vehicle.setModel(model);
             vehicle.setColour(colour);
@@ -1230,20 +1186,21 @@ public class GarageAdmin {
 
                     Bus bus = (Bus)vehicle;
                     bus.setNoOfSeats(noOfSeats);
-                    vehicleList.put(bus.getKey(),bus);
-                    break;
+
+                    vehicleDao.maintain(bus);
+                    return;
                 case "JUGGERNAUT" :
                     StdIO.write("No Of Beds: ");
                     int noOfBeds = Integer.valueOf(StdIO.readLine());
 
                     Juggernaut juggernaut = (Juggernaut)vehicle;
                     juggernaut.setNoOfBeds(noOfBeds);
-                    vehicleList.put(juggernaut.getKey(),juggernaut);
-                    break;
+
+                    vehicleDao.maintain(juggernaut);
+                    return;
             }
 
-            vehicleList.put(vehicle.getKey(), vehicle);
-            FileIO.writeObject(vehicleList, vehicleFile);
+            vehicleDao.maintain(vehicle);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1253,8 +1210,6 @@ public class GarageAdmin {
 
     public void listParkingSlots() {
         System.out.println(ParkingSlot.toStringHeader());
-        //if (parkingSlotList != null)
-         //   parkingSlotList.forEach((k, v) -> System.out.println(v.toStringLine()));
 
         parkingSlotList.values().stream()
                 //.sorted()
@@ -1268,7 +1223,7 @@ public class GarageAdmin {
 
         try {
             StdIO.write("Garage Name : ");
-            String name = StdIO.readLine();
+            String name = StdIO.readLine().toUpperCase();
 
             System.out.println(ParkingSlot.toStringHeader());
 
@@ -1277,11 +1232,10 @@ public class GarageAdmin {
                     .filter(item -> item.isFree())
                     .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
                     .sorted(Comparator.comparing(item -> item.getSize()))
-                    //.sorted(Comparator.comparing(item -> item.getGarage().getName()))
                     .forEach(item -> System.out.println(item.toStringLine()));
 
             System.out.println();
-            System.out.println("Total no of free slots "+countFreeSlotsInTheGarage(garageList.get(name)));
+            System.out.println("Total no of free slots "+countFreeSlotsInTheGarage(garageDao.read(name).get()));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1328,7 +1282,7 @@ public class GarageAdmin {
     private int countAllFreeSlots() {
         int noOfItems = 0;
 
-        for (Garage garage : garageList.values())
+        for (Garage garage : garageDao.readAllGarages())
             noOfItems += countFreeSlotsInTheGarage (garage);
 
         return noOfItems;
@@ -1379,9 +1333,9 @@ public class GarageAdmin {
     private void listGarage() {
         try {
             StdIO.write("Name       : ");
-            String name = StdIO.readLine();
+            String name = StdIO.readLine().toUpperCase();
 
-            listGarage(garageList.get(name));
+            listGarage(garageDao.read(name).get());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1390,7 +1344,7 @@ public class GarageAdmin {
     }
 
     public void listGarages() {
-        for (Garage x : garageList.values()) {
+        for (Garage x : garageDao.readAllGarages()) {
             listGarage (x);
             System.out.println();
         }
@@ -1407,13 +1361,10 @@ public class GarageAdmin {
             String name = StdIO.readLine();
             StdIO.write("Description     : ");
             String description = StdIO.readLine();
-            //StdIO.write("Fee per hour     : ");
-            //String costPerHour = StdIO.readLine();
 
             Garage garage = new Garage(name, description);
 
-            garageList.put(garage.getKey(),garage);
-            FileIO.writeObject(garageList, garageFile);
+            garageDao.maintain(garage);
 
             StdIO.write("No Of Floors    : ");
             int noOfFloors = Integer.valueOf(StdIO.readLine());
@@ -1442,8 +1393,6 @@ public class GarageAdmin {
                             .withSize(slotSize)
                             .withFeePerHour(cost)
                             .build();
-
-                    //ParkingSlot parkingSlot = new ParkingSlot(garage, floor, i, slotSize, cost);
 
                     parkingSlotList.put(parkingSlot.getKey(), parkingSlot);
                 }
