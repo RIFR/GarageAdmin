@@ -30,9 +30,7 @@ public class Account implements java.io.Serializable{
         return bankId;
     }
 
-    public void setBankId(String bankId) {
-        this.bankId = bankId;
-    }
+    //public void setBankId(String bankId) { this.bankId = bankId; }
 
     public Customer getCustomer() {
         return customer;

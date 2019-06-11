@@ -11,17 +11,19 @@ import java.util.*;
 
 public class GarageAdmin {
 
-    private final UserDao     userDao;
-    private final CustomerDao customerDao;
-    private final AccountDao  accountDao;
-    private final VehicleDao  vehicleDao;
-    private final GarageDao   garageDao;
+    //Pointers to interface Implementations (if set)
+    private final UserDao        userDao;
+    private final CustomerDao    customerDao;
+    private final AccountDao     accountDao;
+    private final VehicleDao     vehicleDao;
+    private final GarageDao      garageDao;
+    private final ParkingSlotDao parkingSlotDao;
 
     //private Map<String, User> userList = new HashMap<>();
     //private Map<String, Customer> customerList = new HashMap<>();
     //private Map<String, Account> accountList = new HashMap<>();
     //private Map<String, Vehicle> vehicleList = new HashMap<>();
-    private Map<String, ParkingSlot> parkingSlotList = new HashMap<>();
+    //private Map<String, ParkingSlot> parkingSlotList = new HashMap<>();
     //private Map<String, Garage> garageList = new HashMap<>();
     private List<Scannings> scanningList = new ArrayList<>();
     //private List<Floor> floorList                    = new ArrayList<>();
@@ -42,13 +44,15 @@ public class GarageAdmin {
                        CustomerDao customerDao,
                        AccountDao accountDao,
                        VehicleDao vehicleDao,
-                       GarageDao garageDao) {
+                       GarageDao garageDao,
+                       ParkingSlotDao parkingSlotDao) {
 
-        this.userDao     = Objects.requireNonNull(userDao,"userDao cannot be null");
-        this.customerDao = Objects.requireNonNull(customerDao,"customerDao cannot be null");
-        this.accountDao  = Objects.requireNonNull(accountDao,"accountDao cannot be null");
-        this.vehicleDao  = Objects.requireNonNull(vehicleDao,"vehicleDao cannot be null");
-        this.garageDao   = Objects.requireNonNull(garageDao,"garageDao cannot be null");
+        this.userDao        = Objects.requireNonNull(userDao,"userDao cannot be null");
+        this.customerDao    = Objects.requireNonNull(customerDao,"customerDao cannot be null");
+        this.accountDao     = Objects.requireNonNull(accountDao,"accountDao cannot be null");
+        this.vehicleDao     = Objects.requireNonNull(vehicleDao,"vehicleDao cannot be null");
+        this.garageDao      = Objects.requireNonNull(garageDao,"garageDao cannot be null");
+        this.parkingSlotDao = Objects.requireNonNull(parkingSlotDao,"parkingSlotDao cannot be null");
 
         LoadReloadData();
 
@@ -71,7 +75,8 @@ public class GarageAdmin {
         garageDao.stop();
         //if (garageList      != null) FileIO.writeObject(garageList, garageFile);
 
-        if (parkingSlotList != null) FileIO.writeObject(parkingSlotList, parkingSlotFile);
+        parkingSlotDao.stop();
+        //if (parkingSlotList != null) FileIO.writeObject(parkingSlotList, parkingSlotFile);
 
         if (scanningList    != null) FileIO.writeObject(scanningList, scanningFile);
 
@@ -105,9 +110,10 @@ public class GarageAdmin {
             //if (tempGarageList != null)
             //    garageList = tempGarageList;
 
-            Map<String, ParkingSlot> tempParkingSlotList = FileIO.readObject(parkingSlotFile);
-            if (tempParkingSlotList != null)
-                parkingSlotList = tempParkingSlotList;
+            parkingSlotDao.start(parkingSlotFile);
+//            Map<String, ParkingSlot> tempParkingSlotList = FileIO.readObject(parkingSlotFile);
+//            if (tempParkingSlotList != null)
+//                parkingSlotList = tempParkingSlotList;
 
             List<Scannings> tempScanningList = FileIO.readObject(scanningFile);
             if (tempScanningList != null)
@@ -542,30 +548,33 @@ public class GarageAdmin {
                             .withFloor(floor)
                             .withPlaceNo(1)
                             .withSize(Vehicle.Size.MEDIUM)
-                            .withFeePerHour(20.0d)
+                            .withFee(20.0d)
                             .build();
 
-                    parkingSlotList.put(slotCar1.getKey(),slotCar1);
+                    parkingSlotDao.maintain(slotCar1);
+                    //parkingSlotList.put(slotCar1.getKey(),slotCar1);
 
                     ParkingSlot slotMc1 = new ParkingSlot.Builder()
                             .withGarage(garage1)
                             .withFloor(floor)
                             .withPlaceNo(2)
                             .withSize(Vehicle.Size.SMALL)
-                            .withFeePerHour(5.0d)
+                            .withFee(5.0d)
                             .build();
 
-                    parkingSlotList.put(slotMc1.getKey(),slotMc1);
+                    parkingSlotDao.maintain(slotMc1);
+                    //parkingSlotList.put(slotMc1.getKey(),slotMc1);
 
                     ParkingSlot slotMc2 = new ParkingSlot.Builder()
                             .withGarage(garage1)
                             .withFloor(floor)
                             .withPlaceNo(3)
                             .withSize(Vehicle.Size.SMALL)
-                            .withFeePerHour(5.0d)
+                            .withFee(5.0d)
                             .build();
 
-                    parkingSlotList.put(slotMc2.getKey(),slotMc2);
+                    parkingSlotDao.maintain(slotMc2);
+                    //parkingSlotList.put(slotMc2.getKey(),slotMc2);
 
                     //----------------------------------------------------------------------------------------
 
@@ -580,33 +589,36 @@ public class GarageAdmin {
                             .withFloor(floor1)
                             .withPlaceNo(1)
                             .withSize(Vehicle.Size.MEDIUM)
-                            .withFeePerHour(24.0d)
+                            .withFee(24.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot11);
                     //ParkingSlot slot11 = new ParkingSlot (garage2,floor1,1,Vehicle.Size.MEDIUM,24.0d);
-                    parkingSlotList.put(slot11.getKey(),slot11);
+                    //parkingSlotList.put(slot11.getKey(),slot11);
 
                     ParkingSlot slot12 = new ParkingSlot.Builder()
                             .withGarage(garage2)
                             .withFloor(floor1)
                             .withPlaceNo(2)
                             .withSize(Vehicle.Size.SMALL)
-                            .withFeePerHour(6.0d)
+                            .withFee(6.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot12);
                     //ParkingSlot slot12  = new ParkingSlot (garage2,floor1,2,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slot12.getKey(),slot12);
+                    //parkingSlotList.put(slot12.getKey(),slot12);
 
                     ParkingSlot slot13 = new ParkingSlot.Builder()
                             .withGarage(garage2)
                             .withFloor(floor1)
                             .withPlaceNo(3)
                             .withSize(Vehicle.Size.SMALL)
-                            .withFeePerHour(6.0d)
+                            .withFee(6.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot13);
                     //ParkingSlot slot13  = new ParkingSlot (garage2,floor1,3,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slot13.getKey(),slot13);
+                    //parkingSlotList.put(slot13.getKey(),slot13);
 
                     Floor floor2 = new Floor(2,"plats för 3 mc, 2 bil, 1 Truck  platser");
 
@@ -615,66 +627,72 @@ public class GarageAdmin {
                             .withFloor(floor2)
                             .withPlaceNo(1)
                             .withSize(Vehicle.Size.SMALL)
-                            .withFeePerHour(6.0d)
+                            .withFee(6.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot21);
                     //ParkingSlot slot21  = new ParkingSlot (garage2,floor2,1,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slot21.getKey(),slot21);
+                    //parkingSlotList.put(slot21.getKey(),slot21);
 
                     ParkingSlot slot22 = new ParkingSlot.Builder()
                             .withGarage(garage2)
                             .withFloor(floor2)
                             .withPlaceNo(2)
                             .withSize(Vehicle.Size.SMALL)
-                            .withFeePerHour(6.0d)
+                            .withFee(6.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot22);
                     //ParkingSlot slot22  = new ParkingSlot (garage2,floor2,2,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slot22.getKey(),slot22);
+                    //parkingSlotList.put(slot22.getKey(),slot22);
 
                     ParkingSlot slot23 = new ParkingSlot.Builder()
                             .withGarage(garage2)
                             .withFloor(floor2)
                             .withPlaceNo(3)
                             .withSize(Vehicle.Size.SMALL)
-                            .withFeePerHour(6.0d)
+                            .withFee(6.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot23);
                     //ParkingSlot slot23  = new ParkingSlot (garage2,floor2,3,Vehicle.Size.SMALL,6.0d);
-                    parkingSlotList.put(slot23.getKey(),slot23);
+                    //parkingSlotList.put(slot23.getKey(),slot23);
 
                     ParkingSlot slot24 = new ParkingSlot.Builder()
                             .withGarage(garage2)
                             .withFloor(floor2)
                             .withPlaceNo(4)
                             .withSize(Vehicle.Size.MEDIUM)
-                            .withFeePerHour(24.0d)
+                            .withFee(24.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot24);
                     //ParkingSlot slot24  = new ParkingSlot (garage2,floor2,4,Vehicle.Size.MEDIUM,24.0d);
-                    parkingSlotList.put(slot24.getKey(),slot24);
+                    //parkingSlotList.put(slot24.getKey(),slot24);
 
                     ParkingSlot slot25 = new ParkingSlot.Builder()
                             .withGarage(garage2)
                             .withFloor(floor2)
                             .withPlaceNo(5)
                             .withSize(Vehicle.Size.MEDIUM)
-                            .withFeePerHour(24.0d)
+                            .withFee(24.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot25);
                     //ParkingSlot slot25  = new ParkingSlot (garage2,floor2,5,Vehicle.Size.MEDIUM,24.0d);
-                    parkingSlotList.put(slot25.getKey(),slot25);
+                    //parkingSlotList.put(slot25.getKey(),slot25);
 
                     ParkingSlot slot26 = new ParkingSlot.Builder()
                             .withGarage(garage2)
                             .withFloor(floor2)
                             .withPlaceNo(6)
                             .withSize(Vehicle.Size.LARGE)
-                            .withFeePerHour(48.0d)
+                            .withFee(48.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot26);
                     //ParkingSlot slot26  = new ParkingSlot (garage2,floor2,6,Vehicle.Size.LARGE,48.0d);
-                    parkingSlotList.put(slot26.getKey(),slot26);
+                    //parkingSlotList.put(slot26.getKey(),slot26);
 
                     Floor floor3 = new Floor(3,"plats för 2 långtradare platser");
 
@@ -683,22 +701,24 @@ public class GarageAdmin {
                             .withFloor(floor3)
                             .withPlaceNo(1)
                             .withSize(Vehicle.Size.HUGE)
-                            .withFeePerHour(96.0d)
+                            .withFee(96.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot31);
                     //ParkingSlot slot31  = new ParkingSlot (garage2,floor3,1,Vehicle.Size.HUGE,96.0d);
-                    parkingSlotList.put(slot31.getKey(),slot31);
+                    //parkingSlotList.put(slot31.getKey(),slot31);
 
                     ParkingSlot slot32 = new ParkingSlot.Builder()
                             .withGarage(garage2)
                             .withFloor(floor3)
                             .withPlaceNo(2)
                             .withSize(Vehicle.Size.HUGE)
-                            .withFeePerHour(96.0d)
+                            .withFee(96.0d)
                             .build();
 
+                    parkingSlotDao.maintain(slot32);
                     //ParkingSlot slot32  = new ParkingSlot (garage2,floor3,2,Vehicle.Size.HUGE,96.0d);
-                    parkingSlotList.put(slot32.getKey(),slot32);
+                    //parkingSlotList.put(slot32.getKey(),slot32);
 
                     break;
                 //case "70":
@@ -839,8 +859,9 @@ public class GarageAdmin {
 
             slot.setParked (vehicle);
 
-            parkingSlotList.put(slot.getKey(),slot);
-            FileIO.writeObject(parkingSlotList, parkingSlotFile);
+            parkingSlotDao.maintain(slot);
+            //parkingSlotList.put(slot.getKey(),slot);
+            //FileIO.writeObject(parkingSlotList, parkingSlotFile);
         }
 
         return slot;
@@ -848,7 +869,7 @@ public class GarageAdmin {
 
     public ParkingSlot getSlot (Vehicle vehicle){
 
-        for (ParkingSlot slot : parkingSlotList.values()) {
+        for (ParkingSlot slot : parkingSlotDao.readAllParkingSlots()) {
             if (!slot.isFree() && slot.getParked().getBarcode().equals(vehicle.getBarcode())) {
                  return slot; // found, exit loop
             }
@@ -865,8 +886,9 @@ public class GarageAdmin {
         }
 
         long minutes = slot.free();
-        parkingSlotList.put(slot.getKey(),slot);
-        FileIO.writeObject(parkingSlotList, parkingSlotFile);
+        parkingSlotDao.maintain(slot);
+        //parkingSlotList.put(slot.getKey(),slot);
+        //FileIO.writeObject(parkingSlotList, parkingSlotFile);
 
         Optional<Account> optAccount = accountDao.read(vehicle.getCustomer().getBarCode());
 
@@ -1209,14 +1231,15 @@ public class GarageAdmin {
     }
 
     public void listParkingSlots() {
-        System.out.println(ParkingSlot.toStringHeader());
-
-        parkingSlotList.values().stream()
-                //.sorted()
-                .sorted(Comparator.comparing(item -> item.getPlaceNo()))
-                .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
-                .sorted(Comparator.comparing(item -> item.getGarage().getName()))
-                .forEach(item -> System.out.println(item.toStringLine()));
+        parkingSlotDao.printOut();
+//        System.out.println(ParkingSlot.toStringHeader());
+//
+//        parkingSlotList.values().stream()
+//                //.sorted()
+//                .sorted(Comparator.comparing(item -> item.getPlaceNo()))
+//                .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
+//                .sorted(Comparator.comparing(item -> item.getGarage().getName()))
+//                .forEach(item -> System.out.println(item.toStringLine()));
     }
 
     private void listFreeParkingSlots() {
@@ -1225,14 +1248,16 @@ public class GarageAdmin {
             StdIO.write("Garage Name : ");
             String name = StdIO.readLine().toUpperCase();
 
-            System.out.println(ParkingSlot.toStringHeader());
+            parkingSlotDao.printOut(parkingSlotDao.readFreeParkingSlots(name));
 
-            parkingSlotList.values().stream()
-                    .filter(item -> item.getGarage().getName().equals(name))
-                    .filter(item -> item.isFree())
-                    .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
-                    .sorted(Comparator.comparing(item -> item.getSize()))
-                    .forEach(item -> System.out.println(item.toStringLine()));
+//            System.out.println(ParkingSlot.toStringHeader());
+//
+//            parkingSlotList.values().stream()
+//                    .filter(item -> item.getGarage().getName().equals(name))
+//                    .filter(item -> item.isFree())
+//                    .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
+//                    .sorted(Comparator.comparing(item -> item.getSize()))
+//                    .forEach(item -> System.out.println(item.toStringLine()));
 
             System.out.println();
             System.out.println("Total no of free slots "+countFreeSlotsInTheGarage(garageDao.read(name).get()));
@@ -1245,14 +1270,16 @@ public class GarageAdmin {
 
     private void listAllFreeParkingSlots() {
 
-        System.out.println(ParkingSlot.toStringHeader());
+        parkingSlotDao.printOut(parkingSlotDao.readAllFreeParkingSlots());
 
-        parkingSlotList.values().stream()
-                .filter(item -> item.isFree())
-                .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
-                .sorted(Comparator.comparing(item -> item.getSize()))
-                .sorted(Comparator.comparing(item -> item.getGarage().getName()))
-                .forEach(item -> System.out.println(item.toStringLine()));
+//        System.out.println(ParkingSlot.toStringHeader());
+//
+//        parkingSlotList.values().stream()
+//                .filter(item -> item.isFree())
+//                .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
+//                .sorted(Comparator.comparing(item -> item.getSize()))
+//                .sorted(Comparator.comparing(item -> item.getGarage().getName()))
+//                .forEach(item -> System.out.println(item.toStringLine()));
 
         System.out.println();
         System.out.println("Total no of free slots "+countAllFreeSlots());
@@ -1262,8 +1289,8 @@ public class GarageAdmin {
     private int countNoOfFreeSlots (Garage garage, Vehicle.Size withSize) {
         int noOfItems = 0;
 
-        for (ParkingSlot x : parkingSlotList.values())
-            if (garage.getKey().equals(x.getGarage().getKey()) && x.isFree() && x.getSize() == withSize ) {
+        for (ParkingSlot x : parkingSlotDao.readFreeParkingSlots(garage.getName()))
+            if (x.getSize() == withSize ) {
                 noOfItems++;
             }
 
@@ -1290,10 +1317,8 @@ public class GarageAdmin {
 
     private ParkingSlot getNextFreeWithSize (Garage garage, Vehicle.Size withSize) {
 
-        for (ParkingSlot x : parkingSlotList.values()) {
-            if (garage.getKey().equals(x.getGarage().getKey()) && x.isFree() && x.getSize() == withSize) {
-                return x;
-            }
+        for (ParkingSlot x : parkingSlotDao.readFreeParkingSlots(garage.getName())) {
+            if (x.getSize() == withSize && x.getFeePerMonth() == 0.0d) { return x; }
         }
 
         return null; // Not found
@@ -1321,13 +1346,14 @@ public class GarageAdmin {
 
         System.out.println(garage.getName() + " "+ garage.getDescription());
         //System.out.println();
-        System.out.println(ParkingSlot.toStringHeader());
-        parkingSlotList.values().stream()
-                .filter(item -> item.getGarage().getName().equals(garage.getName()))
-                .sorted(Comparator.comparing(item -> item.getPlaceNo()))
-                .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
-                .sorted(Comparator.comparing(item -> item.getGarage().getName()))
-                .forEach(item -> System.out.println(item.toStringLine()));
+        parkingSlotDao.printOut(parkingSlotDao.readParkingSlots(garage.getName()));
+//        System.out.println(ParkingSlot.toStringHeader());
+//        parkingSlotList.values().stream()
+//                .filter(item -> item.getGarage().getName().equals(garage.getName()))
+//                .sorted(Comparator.comparing(item -> item.getPlaceNo()))
+//                .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
+//                .sorted(Comparator.comparing(item -> item.getGarage().getName()))
+//                .forEach(item -> System.out.println(item.toStringLine()));
     }
 
     private void listGarage() {
@@ -1357,31 +1383,31 @@ public class GarageAdmin {
             StdIO.writeLine("");
             StdIO.writeLine("Create Garage");
             StdIO.writeLine("");
-            StdIO.write("Name       : ");
-            String name = StdIO.readLine();
-            StdIO.write("Description     : ");
+            StdIO.write("Name        : ");
+            String name = StdIO.readLine().toUpperCase();
+            StdIO.write("Description : ");
             String description = StdIO.readLine();
 
             Garage garage = new Garage(name, description);
 
             garageDao.maintain(garage);
 
-            StdIO.write("No Of Floors    : ");
-            int noOfFloors = Integer.valueOf(StdIO.readLine());
+            StdIO.write("No Of Floors: ");
+            final int noOfFloors = Integer.valueOf(StdIO.readLine());
 
-            for (int i = 0; i < noOfFloors; i++) {
+            for (int i = 1; i <= noOfFloors; i++) {
                 StdIO.write(i + " Floor Description: ");
                 description = StdIO.readLine();
 
                 Floor floor = new Floor(i, description);
 
-                StdIO.write("No Of Parking slots on the floor : ");
-                int noOfSlots = Integer.valueOf(StdIO.readLine());
+                StdIO.write("No Of Parking slots on the floor: ");
+                final int noOfSlots = Integer.valueOf(StdIO.readLine());
 
-                StdIO.write("Size of the slots (SMALL,MEDIUM,LARGE,HUGE) : ");
+                StdIO.write("Size of the slots (SMALL,MEDIUM,LARGE,HUGE): ");
                 Vehicle.Size slotSize = Vehicle.Size.valueOf(StdIO.readLine().toUpperCase());
 
-                StdIO.write("Cost per hour : ");
+                StdIO.write("Cost per hour: ");
                 double cost = Double.valueOf(StdIO.readLine());
 
                 for (int j = 0; j < noOfSlots; j++) {
@@ -1389,16 +1415,17 @@ public class GarageAdmin {
                     ParkingSlot parkingSlot = new ParkingSlot.Builder()
                             .withGarage(garage)
                             .withFloor(floor)
-                            .withPlaceNo(i)
+                            .withPlaceNo(j+1)
                             .withSize(slotSize)
-                            .withFeePerHour(cost)
+                            .withFee(cost)
                             .build();
 
-                    parkingSlotList.put(parkingSlot.getKey(), parkingSlot);
+                    parkingSlotDao.maintain(parkingSlot);
+                    //parkingSlotList.put(parkingSlot.getKey(), parkingSlot);
                 }
             }
 
-            FileIO.writeObject(parkingSlotList, parkingSlotFile);
+            //FileIO.writeObject(parkingSlotList, parkingSlotFile);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1413,14 +1440,36 @@ public class GarageAdmin {
             StdIO.writeLine("");
             StdIO.writeLine("Maintain Parking Slot");
             StdIO.writeLine("");
-            StdIO.write("Garage Name : ");
-            String name = StdIO.readLine();
+            StdIO.write("Garage Name: ");
+            String name = StdIO.readLine().toUpperCase();
+            Optional<Garage> optGarage = garageDao.read(name);
+            if (!optGarage.isPresent()) {
+                StdIO.ErrorReport("Unknown garage " + name);
+                return;
+            }
 
-            StdIO.write("Floor : ");
+            StdIO.write("Floor      : ");
             int floorIx = Integer.valueOf(StdIO.readLine());
 
-            StdIO.write("Slot : ");
+            StdIO.write("Slot       : ");
             int slotIx = Integer.valueOf(StdIO.readLine());
+
+            StdIO.write("Slot size (SMALL,MEDIUM,LARGE,HUGE): ");
+            Vehicle.Size slotSize = Vehicle.Size.valueOf(StdIO.readLine().toUpperCase());
+
+            StdIO.write("Cost hour or month (>200): ");
+            double costIx = Double.valueOf(StdIO.readLine());
+
+            ParkingSlot parkingSlot = new ParkingSlot.Builder()
+                    .withGarage(optGarage.get())
+                    .withFloor(new Floor(floorIx, String.valueOf(floorIx)))
+                    .withPlaceNo(slotIx)
+                    .withSize(slotSize)
+                    .withFee(costIx)
+                    .build();
+
+            parkingSlotDao.maintain(parkingSlot);
+
 
         } catch (Exception e) {
             e.printStackTrace();

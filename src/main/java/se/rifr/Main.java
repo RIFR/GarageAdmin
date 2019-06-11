@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String args[]) {
 	    GarageAdmin garageAdmin = new GarageAdmin
-                (new UserDaoImpl(),new CustomerDaoImpl(),new AccountDaoImpl(),new VehicleDaoImpl(),new GarageDaoImpl());
+                (new UserDaoImpl(),new CustomerDaoImpl(),new AccountDaoImpl(),new VehicleDaoImpl(),new GarageDaoImpl(),new ParkingSlotDaoImpl());
 
 	    garageAdmin.start();
     }

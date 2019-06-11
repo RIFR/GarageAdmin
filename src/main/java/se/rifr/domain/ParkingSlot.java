@@ -14,6 +14,7 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
     private int           placeNo;
     private Vehicle.Size size;      // size of the slot
     private double        feePerHour = 0.0d;
+    private double        feePerMonth = 0.0d;
     private Vehicle       parked = null;
     private LocalDateTime timeParked;
 
@@ -23,8 +24,10 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         this.floor      = Objects.requireNonNull(builder.floor);
         this.placeNo    = Objects.requireNonNull(builder.placeNo);
         this.size       = Objects.requireNonNull(builder.size);
-        this.feePerHour = builder.feePerHour;
-
+        if (builder.fee > 200)
+            this.feePerMonth = builder.fee;
+        else
+            this.feePerHour  = builder.fee;
     }
 
     public String getKey() {
@@ -72,6 +75,10 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         this.size = size;
     }
 
+    public double getFeePerMonth() {
+        return feePerMonth;
+    }
+
     public double getFeePerHour() {
         return feePerHour;
     }
@@ -109,7 +116,10 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         returnString += ", Floor='" +  Str.padRight(Integer.toString(getFloor().getLevel()),10);
         returnString += ", Index='" +  Str.padRight(Integer.toString(getPlaceNo()),10);
         returnString += ", Size='" +  Str.padRight(getSize().toString(),10);
-        returnString += ", Fee/Hour='" +  Str.padRight(Double.toString(getFeePerHour()),10);
+        if (getFeePerMonth() == 0.0d)
+            returnString += ", Fee/Hour=='" +  Str.padRight(Double.toString(getFeePerHour()),10);
+        else
+            returnString += ", Fee/Month'" +  Str.padRight(Double.toString(getFeePerMonth()),10);
         if (this.parked != null) {
             returnString += ", Vehicle='" +  Str.padRight(getParked().getBarcode(),20);
             returnString += ", At Time='" +  Str.padRight(getTimeParked().toString().substring(0,19),20);
@@ -125,7 +135,7 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         returnString += Str.padRight("Floor",10);
         returnString += Str.padRight("Index",10);
         returnString += Str.padRight("Size",10);
-        returnString += Str.padRight("Fee/Hour",10);
+        returnString += Str.padRight("Fee(H/M)",10);
         returnString += Str.padRight("Parked",20);
         returnString += Str.padRight("Parked at time",20);
         returnString += Str.padRight("Minutes",10);
@@ -140,7 +150,11 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         returnString += Str.padRight(Integer.toString(getFloor().getLevel()),10);
         returnString += Str.padRight(Integer.toString(getPlaceNo()),10);
         returnString += Str.padRight(getSize().toString(),10);
-        returnString += Str.padLeft(Double.toString(getFeePerHour()) + "  ",10);
+        if (getFeePerMonth() == 0.0d)
+            returnString += Str.padLeft(Double.toString(getFeePerHour()) + "  ",10);
+        else
+            returnString += Str.padLeft(Double.toString(getFeePerMonth()) + "  ",10);
+
         if (this.parked != null) {
             returnString += Str.padRight(getParked().getBarcode(),20);
             returnString += Str.padRight(getTimeParked().toString().substring(0,19),20);
@@ -159,7 +173,7 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
         private Floor         floor;
         private int           placeNo;
         private Vehicle.Size  size;      // size of the slot
-        private double        feePerHour = 0.0d;
+        private double        fee = 0.0d;
 
         public Builder withGarage(Garage garage){
             this.garage = garage;
@@ -181,8 +195,8 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
             return this;
         }
 
-        public Builder withFeePerHour(double feePerHour){
-            this.feePerHour = feePerHour;
+        public Builder withFee(double fee){
+            this.fee = fee;
             return this;
         }
 
