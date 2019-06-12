@@ -1,3 +1,4 @@
+import com.sun.xml.internal.fastinfoset.util.StringArray;
 import se.rifr.GarageAdmin;
 import se.rifr.dao.*;
 
@@ -10,7 +11,8 @@ import java.io.PrintWriter;
 public class GarageAdminServlet extends HttpServlet {
 
     private String title = "Garage Enter / Leaving";
-    GarageAdmin garageAdmin = new GarageAdmin(new UserDaoImpl(), new CustomerDaoImpl(), new AccountDaoImpl(), new VehicleDaoImpl(),new GarageDaoImpl());
+
+    GarageAdmin garageAdmin = new GarageAdmin("conf=DaoTier.xml storage=/var/opt/GarageAdminStorage/".split(" "));
 
     String regid    = "";
     String garageid = "";

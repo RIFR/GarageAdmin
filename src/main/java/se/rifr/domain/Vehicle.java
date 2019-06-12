@@ -5,7 +5,7 @@ import se.rifr.support.Str;
 
 import java.util.Objects;
 
-public abstract class Vehicle implements java.io.Serializable { // Comparable<Vehicle>, java.io.Serializable {
+public abstract class Vehicle implements java.io.Serializable {
 
     public static enum Size {SMALL,MEDIUM,LARGE,HUGE};
 
@@ -21,13 +21,13 @@ public abstract class Vehicle implements java.io.Serializable { // Comparable<Ve
     public Vehicle(Builder builder) {
 
         this.barcode    = Objects.requireNonNull(builder.barcode);
+        this.customer   = Objects.requireNonNull(builder.customer);
         this.model      = builder.model;
         this.colour     = builder.colour;
         this.noOfWheels = builder.noOfWheels;
         this.noiseLevel = builder.noiseLevel;
         this.fuel       = builder.fuel;
         this.size       = builder.size;
-        this.customer   = Objects.requireNonNull(builder.customer);
 
     }
 

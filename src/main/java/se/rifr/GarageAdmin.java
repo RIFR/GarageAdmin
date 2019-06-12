@@ -1,5 +1,7 @@
 package se.rifr;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
 import se.rifr.domain.*;
 import se.rifr.domain.vehicles.*;
 import se.rifr.dao.*;
@@ -40,19 +42,44 @@ public class GarageAdmin {
     private String parkingSlotFile = dirName + "parkingslotlist.ser";
 
 
-    public GarageAdmin(UserDao userDao,
-                       CustomerDao customerDao,
-                       AccountDao accountDao,
-                       VehicleDao vehicleDao,
-                       GarageDao garageDao,
-                       ParkingSlotDao parkingSlotDao) {
+    public GarageAdmin(String args[]) {
 
-        this.userDao        = Objects.requireNonNull(userDao,"userDao cannot be null");
-        this.customerDao    = Objects.requireNonNull(customerDao,"customerDao cannot be null");
-        this.accountDao     = Objects.requireNonNull(accountDao,"accountDao cannot be null");
-        this.vehicleDao     = Objects.requireNonNull(vehicleDao,"vehicleDao cannot be null");
-        this.garageDao      = Objects.requireNonNull(garageDao,"garageDao cannot be null");
-        this.parkingSlotDao = Objects.requireNonNull(parkingSlotDao,"parkingSlotDao cannot be null");
+        ApplicationContext applicationContext = null;
+
+        for (String x : args) {
+
+            int nextIx = x.indexOf("=") + 1;
+
+            switch (x.toUpperCase().substring(0,nextIx)) {
+                case "CONF=" :
+                    if (!x.substring(nextIx).isEmpty())
+                        applicationContext = new GenericXmlApplicationContext(x.substring(nextIx));
+                case "STORAGE=" :
+                    if (!x.substring(nextIx).isEmpty())
+                        this.dirName = x.substring(nextIx);
+            }
+        }
+
+        if (applicationContext == null) {
+
+            System.out.println("USING DEFAULT CONFIGURATION");
+            // use default
+            this.userDao        = new UserDaoImpl();
+            this.customerDao    = new CustomerDaoImpl();
+            this.accountDao     = new AccountDaoImpl();
+            this.vehicleDao     = new VehicleDaoImpl();
+            this.garageDao      = new GarageDaoImpl();
+            this.parkingSlotDao = new ParkingSlotDaoImpl();
+
+        } else {
+
+            this.userDao        = applicationContext.getBean(UserDao.class);
+            this.customerDao    = applicationContext.getBean(CustomerDao.class);
+            this.accountDao     = applicationContext.getBean(AccountDao.class);
+            this.vehicleDao     = applicationContext.getBean(VehicleDao.class);
+            this.garageDao      = applicationContext.getBean(GarageDao.class);
+            this.parkingSlotDao = applicationContext.getBean(ParkingSlotDao.class);
+        }
 
         LoadReloadData();
 
