@@ -3,10 +3,7 @@ package se.rifr.dao;
 import se.rifr.support.FileIO;
 import se.rifr.domain.Customer;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CustomerDaoImpl implements CustomerDao{
@@ -40,9 +37,17 @@ public class CustomerDaoImpl implements CustomerDao{
 
     @Override
     public void printOut(){
+        printOut(readAllCustomers());
+    };
+
+    @Override
+    public void printOut(Collection<Customer> collection){
         System.out.println(Customer.toStringHeader());
-        if (customers != null)
-            customers.forEach((k, v) -> System.out.println(v.toStringLine()));
+        if (collection != null)
+            collection.stream()
+                .sorted(Comparator.comparing(item -> item.getFirstName()))
+                .sorted(Comparator.comparing(item -> item.getLastName()))
+                .forEach(item -> System.out.println(item.toStringLine()));
     };
 
     @Override

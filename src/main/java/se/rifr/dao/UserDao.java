@@ -15,6 +15,7 @@ public interface UserDao {
     Collection<User> readAllUsers();
 
     void printOut();
+    void printOut(Collection<User> collection);
 
     void start(String fileName);
     void stop();

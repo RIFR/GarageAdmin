@@ -40,9 +40,10 @@ public class GarageDaoImpl implements GarageDao{
     };
 
     @Override
-    public void printOut(Collection<Garage> GarageCollection){
+    public void printOut(Collection<Garage> collection){
         System.out.println(Garage.toStringHeader());
-        GarageCollection.stream()
+        if (collection != null)
+            collection.stream()
                 .sorted(Comparator.comparing(item -> item.getName()))
                 .forEach(item -> System.out.println(item.toStringLine()));
     };

@@ -16,7 +16,7 @@ public interface AccountDao {
     Collection<Account> readAccountsWithNegativSaldo();
 
     void printOut();
-    void printOut(Collection<Account> accountCollection);
+    void printOut(Collection<Account> collection);
 
     void start(String fileName);
     void stop();

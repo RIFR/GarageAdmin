@@ -168,8 +168,8 @@ public abstract class Vehicle implements java.io.Serializable {
         private String   barcode;
         private String   model = "UNDEFINED";
         private String   colour= "UNDEFINED";
-        private int      noOfWheels = 4;
-        private int      noiseLevel = 5; // 0-9, 9 highest
+        private Integer  noOfWheels = 4;
+        private Integer  noiseLevel = 5; // 0-9, 9 highest
         private String   fuel= "UNDEFINED";
         private Size     size = Size.MEDIUM;
         private Customer customer;

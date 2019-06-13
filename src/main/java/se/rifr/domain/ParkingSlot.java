@@ -171,9 +171,9 @@ public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializab
 
         private Garage        garage;
         private Floor         floor;
-        private int           placeNo;
+        private Integer       placeNo;
         private Vehicle.Size  size;      // size of the slot
-        private double        fee = 0.0d;
+        private Double        fee = 0.0d;
 
         public Builder withGarage(Garage garage){
             this.garage = garage;

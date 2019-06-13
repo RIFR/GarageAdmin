@@ -1,0 +1,16 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<beans xmlns = "http://www.springframework.org/schema/beans"
+       xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id = "accountDao" class = "se.rifr.dao.AccountDaoImpl"/>
+    <bean id = "customerDao" class = "se.rifr.dao.CustomerDaoImpl"/>
+    <bean id = "garageDao" class = "se.rifr.dao.GarageDaoImpl"/>
+    <bean id = "parkingSlotDao" class = "se.rifr.dao.ParkingSlotDaoImpl"/>
+    <bean id = "userDao" class = "se.rifr.dao.UserDaoImpl"/>
+    <bean id = "vehicleDao" class = "se.rifr.dao.VehicleDaoImpl"/>
+    <bean id = "scanningsDao" class = "se.rifr.dao.ScanningsDaoImpl"/>
+
+</beans>

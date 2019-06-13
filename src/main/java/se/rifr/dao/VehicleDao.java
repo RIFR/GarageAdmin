@@ -15,7 +15,7 @@ public interface VehicleDao {
     Collection<Vehicle> readAllVehicles();
 
     void printOut();
-    void printOut(Collection<Vehicle> VehicleCollection);
+    void printOut(Collection<Vehicle> collection);
 
     void start(String fileName);
     void stop();

@@ -60,9 +60,10 @@ public class ParkingSlotDaoImpl implements ParkingSlotDao{
     };
 
     @Override
-    public void printOut(Collection<ParkingSlot> ParkingSlotCollection){
+    public void printOut(Collection<ParkingSlot> collection){
         System.out.println(ParkingSlot.toStringHeader());
-        ParkingSlotCollection.stream()
+        if (collection != null)
+            collection.stream()
                 .sorted(Comparator.comparing(item -> item.getPlaceNo()))
                 .sorted(Comparator.comparing(item -> item.getFloor().getLevel()))
                 .sorted(Comparator.comparing(item -> item.getGarage().getName()))

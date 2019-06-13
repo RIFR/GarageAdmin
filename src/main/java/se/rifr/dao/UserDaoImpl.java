@@ -3,10 +3,7 @@ package se.rifr.dao;
 import se.rifr.support.FileIO;
 import se.rifr.domain.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UserDaoImpl implements UserDao{
@@ -40,12 +37,16 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
-    public void printOut(){
+    public void printOut(){printOut(readAllUsers());}
+
+    @Override
+    public void printOut(Collection<User> collection){
         System.out.println(User.toStringHeader());
-        if (users != null)
-            users.values().stream()
-                    .filter(item -> !item.getKey().equals("SuperUser"))
-                    .forEach(item -> System.out.println(item.toStringLine()));
+        if (collection != null)
+            collection.stream()
+                .sorted(Comparator.comparing(item -> item.getFirstName()))
+                .sorted(Comparator.comparing(item -> item.getLastName()))
+                .forEach(item -> System.out.println(item.toStringLine()));
     };
 
     @Override

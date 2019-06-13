@@ -1,6 +1,6 @@
-import com.sun.xml.internal.fastinfoset.util.StringArray;
+
 import se.rifr.GarageAdmin;
-import se.rifr.dao.*;
+import sun.misc.OSEnvironment;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,10 +12,22 @@ public class GarageAdminServlet extends HttpServlet {
 
     private String title = "Garage Enter / Leaving";
 
-    GarageAdmin garageAdmin = new GarageAdmin("conf=DaoTier.xml storage=/var/opt/GarageAdminStorage/".split(" "));
+    String arg= "conf=applicationContext.xml storage="+getStorageLocation();
+    GarageAdmin garageAdmin = new GarageAdmin(arg.split(" "));
 
     String regid    = "";
     String garageid = "";
+
+    private String getStorageLocation (){
+        String OS = System.getProperty("os.name").toLowerCase();
+
+        System.out.println(OS);
+
+        if (OS.indexOf("win") >= 0) {
+            return "C:\\Dev\\GarageAdmin\\";
+        }
+        return "/var/opt/GarageAdminStorage/";
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -30,8 +42,8 @@ public class GarageAdminServlet extends HttpServlet {
         } else {
             System.out.println(pos);
 
-            garageAdmin.listGarages();
-            garageAdmin.listVehicles();
+            //garageAdmin.listGarages();
+            //garageAdmin.listVehicles();
 
            switch (pos) {
                 case "m":
@@ -177,7 +189,7 @@ public class GarageAdminServlet extends HttpServlet {
         returnStr += "    <br />";
         returnStr += "    <input type = \"submit\" value = \"Submit\" />\n";
         returnStr += "</form>";
-        title = "MENU create Vehicle ";
+        title = "MENU add Vehicle ";
 
         return returnStr;
 
@@ -202,7 +214,7 @@ public class GarageAdminServlet extends HttpServlet {
         returnStr += "    <br />";
         returnStr += "    <input type = \"submit\" value = \"Submit\" />\n";
         returnStr += "</form>";
-        title = "MENU create customer ";
+        title = "MENU add customer ";
 
         return returnStr;
 

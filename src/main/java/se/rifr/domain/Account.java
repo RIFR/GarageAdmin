@@ -24,7 +24,7 @@ public class Account implements java.io.Serializable{
 
     }
 
-    public String getKey() { return bankId; }
+    public String getKey() { return customer.getBarCode(); }
 
     public String getBankId() {
         return bankId;
@@ -117,7 +117,7 @@ public class Account implements java.io.Serializable{
 
         private Customer customer;
         private String   bankId;
-        private double   saldo;
+        private Double   saldo;
         private String   description;
 
         public Builder withCustomer(Customer customer){

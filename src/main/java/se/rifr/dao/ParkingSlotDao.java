@@ -18,7 +18,7 @@ public interface ParkingSlotDao {
     Collection<ParkingSlot> readFreeParkingSlots(String inGarage);
 
     void printOut();
-    void printOut(Collection<ParkingSlot> ParkingSlotCollection);
+    void printOut(Collection<ParkingSlot> collection);
 
     void start(String fileName);
     void stop();

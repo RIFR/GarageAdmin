@@ -15,7 +15,7 @@ public interface GarageDao {
     Collection<Garage> readAllGarages();
 
     void printOut();
-    void printOut(Collection<Garage> GarageCollection);
+    void printOut(Collection<Garage> collection);
 
     void start(String fileName);
     void stop();

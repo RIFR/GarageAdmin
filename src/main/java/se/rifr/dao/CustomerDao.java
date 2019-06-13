@@ -15,6 +15,7 @@ public interface CustomerDao {
     Collection<Customer> readAllCustomers();
 
     void printOut();
+    void printOut(Collection<Customer> collection);
 
     void start(String fileName);
     void stop();

@@ -5,7 +5,6 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 import se.rifr.domain.*;
 import se.rifr.domain.vehicles.*;
 import se.rifr.dao.*;
-import se.rifr.support.FileIO;
 import se.rifr.support.StdIO;
 
 import java.time.LocalDateTime;
@@ -20,6 +19,7 @@ public class GarageAdmin {
     private final VehicleDao     vehicleDao;
     private final GarageDao      garageDao;
     private final ParkingSlotDao parkingSlotDao;
+    private final ScanningsDao   scanningsDao;
 
     //private Map<String, User> userList = new HashMap<>();
     //private Map<String, Customer> customerList = new HashMap<>();
@@ -27,7 +27,7 @@ public class GarageAdmin {
     //private Map<String, Vehicle> vehicleList = new HashMap<>();
     //private Map<String, ParkingSlot> parkingSlotList = new HashMap<>();
     //private Map<String, Garage> garageList = new HashMap<>();
-    private List<Scannings> scanningList = new ArrayList<>();
+    //private List<Scannings> scanningList = new ArrayList<>();
     //private List<Floor> floorList                    = new ArrayList<>();
     //private List<Garage> garageList                  = new ArrayList<>();
 
@@ -42,50 +42,45 @@ public class GarageAdmin {
     private String parkingSlotFile = dirName + "parkingslotlist.ser";
 
 
-    public GarageAdmin(String args[]) {
+    public GarageAdmin(String[] args) {
+
+        //System.getProperties().list(System.out);
 
         ApplicationContext applicationContext = null;
 
         for (String x : args) {
 
-            int nextIx = x.indexOf("=") + 1;
+            int ix = x.indexOf("=") + 1;
 
-            switch (x.toUpperCase().substring(0,nextIx)) {
+            switch (x.toUpperCase().substring(0,ix)) {
                 case "CONF=" :
-                    if (!x.substring(nextIx).isEmpty())
-                        applicationContext = new GenericXmlApplicationContext(x.substring(nextIx));
+                    if (!x.substring(ix).isEmpty())
+                        applicationContext = new GenericXmlApplicationContext(x.substring(ix));
                 case "STORAGE=" :
-                    if (!x.substring(nextIx).isEmpty())
-                        this.dirName = x.substring(nextIx);
+                    if (!x.substring(ix).isEmpty())
+                        this.dirName = x.substring(ix);
             }
         }
 
         if (applicationContext == null) {
 
-            System.out.println("USING DEFAULT CONFIGURATION");
-            // use default
-            this.userDao        = new UserDaoImpl();
-            this.customerDao    = new CustomerDaoImpl();
-            this.accountDao     = new AccountDaoImpl();
-            this.vehicleDao     = new VehicleDaoImpl();
-            this.garageDao      = new GarageDaoImpl();
-            this.parkingSlotDao = new ParkingSlotDaoImpl();
+            applicationContext = new GenericXmlApplicationContext("applicationContext.xml");
 
-        } else {
-
-            this.userDao        = applicationContext.getBean(UserDao.class);
-            this.customerDao    = applicationContext.getBean(CustomerDao.class);
-            this.accountDao     = applicationContext.getBean(AccountDao.class);
-            this.vehicleDao     = applicationContext.getBean(VehicleDao.class);
-            this.garageDao      = applicationContext.getBean(GarageDao.class);
-            this.parkingSlotDao = applicationContext.getBean(ParkingSlotDao.class);
         }
+
+        this.userDao        = applicationContext.getBean(UserDao.class);
+        this.customerDao    = applicationContext.getBean(CustomerDao.class);
+        this.accountDao     = applicationContext.getBean(AccountDao.class);
+        this.vehicleDao     = applicationContext.getBean(VehicleDao.class);
+        this.garageDao      = applicationContext.getBean(GarageDao.class);
+        this.parkingSlotDao = applicationContext.getBean(ParkingSlotDao.class);
+        this.scanningsDao   = applicationContext.getBean(ScanningsDao.class);
 
         LoadReloadData();
 
     }
 
-    public void SaveAllData() {
+    private void SaveAllData() {
 
         userDao.stop();
         //if (userList        != null) FileIO.writeObject(userList, userFile);
@@ -105,7 +100,8 @@ public class GarageAdmin {
         parkingSlotDao.stop();
         //if (parkingSlotList != null) FileIO.writeObject(parkingSlotList, parkingSlotFile);
 
-        if (scanningList    != null) FileIO.writeObject(scanningList, scanningFile);
+        scanningsDao.stop();
+        //if (scanningList    != null) FileIO.writeObject(scanningList, scanningFile);
 
     }
 
@@ -142,9 +138,10 @@ public class GarageAdmin {
 //            if (tempParkingSlotList != null)
 //                parkingSlotList = tempParkingSlotList;
 
-            List<Scannings> tempScanningList = FileIO.readObject(scanningFile);
-            if (tempScanningList != null)
-                scanningList = tempScanningList;
+            scanningsDao.start(scanningFile);
+//            List<Scannings> tempScanningList = FileIO.readObject(scanningFile);
+//            if (tempScanningList != null)
+//                scanningList = tempScanningList;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -295,11 +292,14 @@ public class GarageAdmin {
 
             // Store the updated scanning
             Scannings scanning = new Scannings(vehicle, LocalDateTime.now(), true, garage);
-            scanningList.add(scanning);
-            FileIO.writeObject(scanningList, scanningFile);
+            scanningsDao.add(scanning);
+//            scanningList.add(scanning);
+//            FileIO.writeObject(scanningList, scanningFile);
 
             return slot.toString();}
-        else return "";
+        else {
+            StdIO.ErrorReport("The vehicle " + vehicle.getBarcode() + " could not be parked in "+garage.getName());
+            return "";}
     }
 
     public String unparkVehicle (Vehicle vehicle) {
@@ -310,8 +310,9 @@ public class GarageAdmin {
 
             // Store the updated scanning
             Scannings scanning = new Scannings(vehicle, LocalDateTime.now(), false, slot.getGarage());
-            scanningList.add(scanning);
-            FileIO.writeObject(scanningList, scanningFile);
+            scanningsDao.add(scanning);
+//            scanningList.add(scanning);
+//            FileIO.writeObject(scanningList, scanningFile);
 
             return slot.toString();
         } else return "";
@@ -401,6 +402,12 @@ public class GarageAdmin {
                 case "18":
                     listScannings();
                     break;
+                case "19":
+                    listVehicleScannings();
+                    break;
+                case "20":
+                    listCustomerScannings();
+                    break;
                 //case "17":
                 //    excludeOrOpeVehicle(true);
                 //    break;
@@ -436,8 +443,8 @@ public class GarageAdmin {
                     String temp = parkVehicle(myMc,myGarage);
                     if (!temp.isEmpty())
                         System.out.println("Slot "+temp+" found for "+myMc);
-                    else
-                        System.out.println("No slot found for "+myMc);
+                    //else
+                    //    StdIO.ErrorReport("No slot found for "+myMc);
 
                     Car myCar = new Car.Builder()
                             .withBarcode(regNoP0+"111".toUpperCase())
@@ -455,8 +462,8 @@ public class GarageAdmin {
                     temp = parkVehicle(myCar,myGarage);
                     if (!temp.isEmpty())
                         System.out.println("Slot "+temp+" found for "+myCar);
-                    else
-                        System.out.println("No slot found for "+myCar);
+                    //else
+                    //    StdIO.ErrorReport("No slot found for "+myCar);
 
                     Truck myTruck = new Truck.Builder()
                             .withBarcode(regNoP0+"222".toUpperCase())
@@ -474,8 +481,8 @@ public class GarageAdmin {
                     temp = parkVehicle(myTruck,myGarage);
                     if (!temp.isEmpty())
                         System.out.println("Slot "+temp+" found for "+myTruck);
-                    else
-                        System.out.println("No slot found for "+myTruck);
+                    //else
+                    //    StdIO.ErrorReport("No slot found for "+myTruck);
 
                     Lorry myLorry = new Lorry.Builder()
                             .withBarcode(regNoP0+"333".toUpperCase())
@@ -493,8 +500,8 @@ public class GarageAdmin {
                     temp = parkVehicle(myLorry,myGarage);
                     if (!temp.isEmpty())
                         System.out.println("Slot "+temp+" found for "+myLorry);
-                    else
-                        System.out.println("No slot found for "+myLorry);
+                    //else
+                    //    StdIO.ErrorReport("No slot found for "+myLorry);
 
                     Juggernaut myJuggernaut = new Juggernaut.Builder()
                             .withBarcode(regNoP0+"444".toUpperCase())
@@ -513,8 +520,8 @@ public class GarageAdmin {
                     temp = parkVehicle(myJuggernaut,myGarage);
                     if (!temp.isEmpty())
                         System.out.println("Slot "+temp+" found for "+myJuggernaut);
-                    else
-                        System.out.println("No slot found for "+myJuggernaut);
+                    //else
+                    //    StdIO.ErrorReport("No slot found for "+myJuggernaut);
 
                     System.out.println("No of free slots "+ countFreeSlotsInTheGarage(myGarage));
 
@@ -806,6 +813,8 @@ public class GarageAdmin {
             StdIO.writeLine("16. List Free Parkingslots in a garage");
             StdIO.writeLine("17. Scan Parking ");
             StdIO.writeLine("18. List Parking");
+            StdIO.writeLine("19. List Vehicle Parking");
+            StdIO.writeLine("20. List Customer Parking");
             StdIO.writeLine("");
             StdIO.writeLine("q. Exit");
             StdIO.writeLine("");
@@ -858,8 +867,9 @@ public class GarageAdmin {
 
             // Store the updated scanning
             Scannings scanning = new Scannings(optVehicle.get(), LocalDateTime.now(), entering, garage);
-            scanningList.add(scanning);
-            FileIO.writeObject(scanningList, scanningFile);
+            scanningsDao.add(scanning);
+//            scanningList.add(scanning);
+//            FileIO.writeObject(scanningList, scanningFile);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -867,7 +877,7 @@ public class GarageAdmin {
         }
     }
 
-     public ParkingSlot park (Vehicle vehicle, Garage inGarage){
+    private ParkingSlot park (Vehicle vehicle, Garage inGarage){
 
          ParkingSlot slot = getSlot (vehicle);
          if (slot != null) {
@@ -877,7 +887,7 @@ public class GarageAdmin {
 
              } else {
                  StdIO.ErrorReport("Already parked "+vehicle.getBarcode()+" in "+ slot.getGarage().getName());
-                 return null;
+                 return slot;
              }
          }
 
@@ -894,7 +904,7 @@ public class GarageAdmin {
         return slot;
     }
 
-    public ParkingSlot getSlot (Vehicle vehicle){
+    private ParkingSlot getSlot (Vehicle vehicle){
 
         for (ParkingSlot slot : parkingSlotDao.readAllParkingSlots()) {
             if (!slot.isFree() && slot.getParked().getBarcode().equals(vehicle.getBarcode())) {
@@ -904,11 +914,12 @@ public class GarageAdmin {
         return null;
     }
 
-    public ParkingSlot unpark (Vehicle vehicle){
+    private ParkingSlot unpark (Vehicle vehicle){
 
         ParkingSlot slot = getSlot (vehicle);
         if (slot == null) {
-            StdIO.ErrorReport("Not parked "+vehicle);
+            StdIO.ErrorReport("Not parked "+vehicle.getBarcode() + ",customer "+vehicle.getCustomer().getFullName() +
+                    ",telephone number " + vehicle.getCustomer().getTelephoneNumber());
             return null;
         }
 
@@ -927,7 +938,8 @@ public class GarageAdmin {
              accountDao.maintain(optAccount.get());
         } else
             System.out.println("The "+vehicle+" was parked for "+minutes+
-                    " minutes, since the owner did not have any account he/she need to pay the fee now");
+                    " minutes, since the owner did not have any account he/she need to pay the fee " +
+                    slot.getFeePerMinute()*minutes + " now");
         //" minutes, since the owner did not have any account he/she need to pay the fee of "+
         //        slot.getGarage().getFeePerMinute()*minutes +" now");
 
@@ -994,13 +1006,37 @@ public class GarageAdmin {
         }
     }
 
-    public void listScannings() {
-        System.out.println(Scannings.toStringHeader());
-        if (scanningList != null)
-            scanningList.stream().forEach(item -> System.out.println(item.toStringLine()));
+    private void listScannings() { scanningsDao.printOut(); }
+
+    private void listVehicleScannings () {
+
+        try {
+
+            StdIO.write("Vehicle: ");
+            String barcode = StdIO.readLine();
+            scanningsDao.printOut(scanningsDao.readVehicleScannings(barcode));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            StdIO.ErrorReport("Exception -" + e.toString());
+        }
     }
 
-    public void listUsers() {
+    private void listCustomerScannings () {
+
+        try {
+
+            StdIO.write("Vehicle: ");
+            String barcode = StdIO.readLine();
+            scanningsDao.printOut(scanningsDao.readCustomerScannings(barcode));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            StdIO.ErrorReport("Exception -" + e.toString());
+        }
+    }
+
+    private void listUsers() {
         userDao.printOut();
 //        System.out.println(User.toStringHeader());
 //        if (userList != null)
@@ -1139,7 +1175,7 @@ public class GarageAdmin {
             StdIO.write("Description : ");
             String description = StdIO.readLine();
 
-            Optional<Account> optAccount = accountDao.read(accountID);
+            Optional<Account> optAccount = accountDao.read(barcode);
 
             if(optAccount.isPresent()) {
                 if (!optAccount.get().getCustomer().getBarCode().equals(optCustomer.get().getBarCode())) {
@@ -1171,7 +1207,7 @@ public class GarageAdmin {
         }
     }
 
-    public void listVehicles() { vehicleDao.printOut(); }
+    private void listVehicles() { vehicleDao.printOut(); }
 
     private void maintainVehicles() {
         Vehicle vehicle;
@@ -1257,7 +1293,7 @@ public class GarageAdmin {
         }
     }
 
-    public void listParkingSlots() {
+    private void listParkingSlots() {
         parkingSlotDao.printOut();
 //        System.out.println(ParkingSlot.toStringHeader());
 //
@@ -1396,7 +1432,7 @@ public class GarageAdmin {
         }
     }
 
-    public void listGarages() {
+    private void listGarages() {
         for (Garage x : garageDao.readAllGarages()) {
             listGarage (x);
             System.out.println();

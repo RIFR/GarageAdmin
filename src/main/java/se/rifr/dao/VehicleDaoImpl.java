@@ -40,13 +40,15 @@ public class VehicleDaoImpl implements VehicleDao{
     };
 
     @Override
-    public void printOut(Collection<Vehicle> VehicleCollection){
+    public void printOut(Collection<Vehicle> collection){
         System.out.println(Vehicle.toStringHeader());
-        VehicleCollection.stream()
-                .sorted(Comparator.comparing(item -> item.getSize()))
-                .sorted(Comparator.comparing(item -> item.getBarcode()))
-                .sorted(Comparator.comparing(item -> item.getCustomer().getFullName()))
-                .forEach(item -> System.out.println(item.toStringLine()));
+        if (collection != null)
+            collection.stream()
+                    .sorted(Comparator.comparing(item -> item.getBarcode()))
+                    .sorted(Comparator.comparing(item -> item.getClass().getSimpleName()))
+                    .sorted(Comparator.comparing(item -> item.getSize()))
+                    .sorted(Comparator.comparing(item -> item.getCustomer().getFullName()))
+                    .forEach(item -> System.out.println(item.toStringLine()));
     };
 
     @Override

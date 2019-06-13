@@ -3,10 +3,7 @@ package se.rifr.dao;
 import se.rifr.support.FileIO;
 import se.rifr.domain.Account;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AccountDaoImpl implements AccountDao{
@@ -50,9 +47,13 @@ public class AccountDaoImpl implements AccountDao{
     };
 
     @Override
-    public void printOut(Collection<Account> accountCollection){
+    public void printOut(Collection<Account> collection){
         System.out.println(Account.toStringHeader());
-        accountCollection.stream().forEach(item -> System.out.println(item.toStringLine()));
+        if (collection != null)
+            collection.stream()
+                    .sorted(Comparator.comparing(item -> item.getCustomer().getFirstName()))
+                    .sorted(Comparator.comparing(item -> item.getCustomer().getLastName()))
+                    .forEach(item -> System.out.println(item.toStringLine()));
     };
 
 
