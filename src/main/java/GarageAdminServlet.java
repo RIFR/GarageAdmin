@@ -1,4 +1,5 @@
-import se.rifr.service.GarageAdmin;
+import se.rifr.service.GarageServiceImpl;
+import se.rifr.service.GarageService;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +11,7 @@ public class GarageAdminServlet extends HttpServlet {
 
     private String title = "Garage Enter / Leaving";
 
-    GarageAdmin garageAdmin = new GarageAdmin(new String [0]); //on default
+    GarageService garageAdmin = new GarageServiceImpl();
 
     String regid    = "";
     String garageid = "";

@@ -1,10 +1,14 @@
 package se.rifr;
+
+import se.rifr.service.GarageService;
+import se.rifr.service.GarageServiceImpl;
+
 public class Main {
 
     public static void main(String[] args) {
 
-        GarageAdmin garageAdmin = new GarageAdmin (args);
+        GarageService garageService = new GarageServiceImpl();
 
-	    garageAdmin.start();
+        garageService.start();
     }
 }
