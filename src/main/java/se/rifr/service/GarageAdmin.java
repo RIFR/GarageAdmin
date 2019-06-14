@@ -1,4 +1,4 @@
-package se.rifr;
+package se.rifr.service;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -31,22 +31,21 @@ public class GarageAdmin {
     //private List<Floor> floorList                    = new ArrayList<>();
     //private List<Garage> garageList                  = new ArrayList<>();
 
-    private String dirName = "/var/opt/GarageAdminStorage/";
-
-    private String userFile        = "userlist.ser";
-    private String customerFile    = "customerlist.ser";
-    private String accountFile     = "accountlist.ser";
-    private String vehicleFile     = "vehiclelist.ser";
-    private String scanningFile    = "scanninglist.ser";
-    private String garageFile      = "garagelist.ser";
-    private String parkingSlotFile = "parkingslotlist.ser";
-
+    private String defaultDirNameUnix    = "/var/opt/GarageAdminStorage/";
+    private String defaultDirNameWindows = "C:\\Dev\\GarageAdmin\\";
+    private String dirName = "";
 
     public GarageAdmin(String[] args) {
 
         //System.getProperties().list(System.out);
+        String OS = System.getProperty("os.name").toLowerCase();
 
-        ApplicationContext applicationContext = null;
+        if (OS.indexOf("win") >= 0)
+            dirName = defaultDirNameWindows;
+        else
+            dirName = defaultDirNameUnix;
+
+        String applicationContextFileName = "applicationContext.xml";
 
         for (String x : args) {
 
@@ -55,18 +54,14 @@ public class GarageAdmin {
             switch (x.toUpperCase().substring(0,ix)) {
                 case "CONF=" :
                     if (!x.substring(ix).isEmpty())
-                        applicationContext = new GenericXmlApplicationContext(x.substring(ix));
+                        applicationContextFileName = x.substring(ix);
                 case "STORAGE=" :
                     if (!x.substring(ix).isEmpty())
                         this.dirName = x.substring(ix);
             }
         }
 
-        if (applicationContext == null) {
-
-            applicationContext = new GenericXmlApplicationContext("applicationContext.xml");
-
-        }
+        ApplicationContext  applicationContext = new GenericXmlApplicationContext(applicationContextFileName);
 
         this.userDao        = applicationContext.getBean(UserDao.class);
         this.customerDao    = applicationContext.getBean(CustomerDao.class);
@@ -83,70 +78,25 @@ public class GarageAdmin {
     private void SaveAllData() {
 
         userDao.stop();
-        //if (userList        != null) FileIO.writeObject(userList, userFile);
-
         customerDao.stop();
-        //if (customerList    != null) FileIO.writeObject(customerList, customerFile);
-
         accountDao.stop();
-        //if (accountList     != null) FileIO.writeObject(accountList, accountFile);
-
         vehicleDao.stop();
-        //if (vehicleList     != null) FileIO.writeObject(vehicleList, vehicleFile);
-
         garageDao.stop();
-        //if (garageList      != null) FileIO.writeObject(garageList, garageFile);
-
         parkingSlotDao.stop();
-        //if (parkingSlotList != null) FileIO.writeObject(parkingSlotList, parkingSlotFile);
-
         scanningsDao.stop();
-        //if (scanningList    != null) FileIO.writeObject(scanningList, scanningFile);
 
     }
 
     public void LoadReloadData() {
 
-        try {
-            userDao.start(dirName + userFile);
-//            Map<String, User> tempUserList = FileIO.readObject(userFile);
-//            if (tempUserList != null)
-//                userList = tempUserList;
+        userDao.start       (dirName + "userlist.ser");
+        customerDao.start   (dirName + "customerlist.ser");
+        accountDao.start    (dirName + "accountlist.ser");
+        vehicleDao.start    (dirName + "vehiclelist.ser");
+        garageDao.start     (dirName + "garagelist.ser");
+        parkingSlotDao.start(dirName + "parkingslotlist.ser");
+        scanningsDao.start  (dirName + "scanninglist.ser");
 
-            customerDao.start(dirName + customerFile);
-//            Map<String, Customer> tempCustomerList = FileIO.readObject(customerFile);
-//            if (tempCustomerList != null)
-//                customerList = tempCustomerList;
-
-            accountDao.start(dirName + accountFile);
-//            Map<String, Account> tempAccountList = FileIO.readObject(accountFile);
-//            if (tempAccountList != null)
-//                accountList = tempAccountList;
-
-            vehicleDao.start(dirName + vehicleFile);
-//            Map<String, Vehicle> tempVehicleList = FileIO.readObject(vehicleFile);
-//            if (tempVehicleList != null)
-//                vehicleList = tempVehicleList;
-
-            garageDao.start(dirName + garageFile);
-            //Map<String, Garage> tempGarageList= FileIO.readObject(garageFile);
-            //if (tempGarageList != null)
-            //    garageList = tempGarageList;
-
-            parkingSlotDao.start(dirName + parkingSlotFile);
-//            Map<String, ParkingSlot> tempParkingSlotList = FileIO.readObject(parkingSlotFile);
-//            if (tempParkingSlotList != null)
-//                parkingSlotList = tempParkingSlotList;
-
-            scanningsDao.start(dirName + scanningFile);
-//            List<Scannings> tempScanningList = FileIO.readObject(scanningFile);
-//            if (tempScanningList != null)
-//                scanningList = tempScanningList;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            StdIO.ErrorReport("Exception -" + e.toString());
-        }
     }
 
     private boolean login() {
@@ -812,9 +762,9 @@ public class GarageAdmin {
             StdIO.writeLine("15. List All Free Parkingslots ");
             StdIO.writeLine("16. List Free Parkingslots in a garage");
             StdIO.writeLine("17. Scan Parking ");
-            StdIO.writeLine("18. List Parking");
-            StdIO.writeLine("19. List Vehicle Parking");
-            StdIO.writeLine("20. List Customer Parking");
+            StdIO.writeLine("18. List Scannings");
+            StdIO.writeLine("19. List Vehicle Scannings");
+            StdIO.writeLine("20. List Customer Scannings");
             StdIO.writeLine("");
             StdIO.writeLine("q. Exit");
             StdIO.writeLine("");

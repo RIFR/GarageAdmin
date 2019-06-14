@@ -1,6 +1,4 @@
-
-import se.rifr.GarageAdmin;
-import sun.misc.OSEnvironment;
+import se.rifr.service.GarageAdmin;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,22 +10,10 @@ public class GarageAdminServlet extends HttpServlet {
 
     private String title = "Garage Enter / Leaving";
 
-    String arg= "conf=applicationContext.xml storage="+getStorageLocation();
-    GarageAdmin garageAdmin = new GarageAdmin(arg.split(" "));
+    GarageAdmin garageAdmin = new GarageAdmin(new String [0]); //on default
 
     String regid    = "";
     String garageid = "";
-
-    private String getStorageLocation (){
-        String OS = System.getProperty("os.name").toLowerCase();
-
-        System.out.println(OS);
-
-        if (OS.indexOf("win") >= 0) {
-            return "C:\\Dev\\GarageAdmin\\";
-        }
-        return "/var/opt/GarageAdminStorage/";
-    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
