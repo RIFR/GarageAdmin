@@ -33,13 +33,13 @@ public class GarageAdmin {
 
     private String dirName = "/var/opt/GarageAdminStorage/";
 
-    private String userFile        = dirName + "userlist.ser";
-    private String customerFile    = dirName + "customerlist.ser";
-    private String accountFile     = dirName + "accountlist.ser";
-    private String vehicleFile     = dirName + "vehiclelist.ser";
-    private String scanningFile    = dirName + "scanninglist.ser";
-    private String garageFile      = dirName + "garagelist.ser";
-    private String parkingSlotFile = dirName + "parkingslotlist.ser";
+    private String userFile        = "userlist.ser";
+    private String customerFile    = "customerlist.ser";
+    private String accountFile     = "accountlist.ser";
+    private String vehicleFile     = "vehiclelist.ser";
+    private String scanningFile    = "scanninglist.ser";
+    private String garageFile      = "garagelist.ser";
+    private String parkingSlotFile = "parkingslotlist.ser";
 
 
     public GarageAdmin(String[] args) {
@@ -108,37 +108,37 @@ public class GarageAdmin {
     public void LoadReloadData() {
 
         try {
-            userDao.start(userFile);
+            userDao.start(dirName + userFile);
 //            Map<String, User> tempUserList = FileIO.readObject(userFile);
 //            if (tempUserList != null)
 //                userList = tempUserList;
 
-            customerDao.start(customerFile);
+            customerDao.start(dirName + customerFile);
 //            Map<String, Customer> tempCustomerList = FileIO.readObject(customerFile);
 //            if (tempCustomerList != null)
 //                customerList = tempCustomerList;
 
-            accountDao.start(accountFile);
+            accountDao.start(dirName + accountFile);
 //            Map<String, Account> tempAccountList = FileIO.readObject(accountFile);
 //            if (tempAccountList != null)
 //                accountList = tempAccountList;
 
-            vehicleDao.start(vehicleFile);
+            vehicleDao.start(dirName + vehicleFile);
 //            Map<String, Vehicle> tempVehicleList = FileIO.readObject(vehicleFile);
 //            if (tempVehicleList != null)
 //                vehicleList = tempVehicleList;
 
-            garageDao.start(garageFile);
+            garageDao.start(dirName + garageFile);
             //Map<String, Garage> tempGarageList= FileIO.readObject(garageFile);
             //if (tempGarageList != null)
             //    garageList = tempGarageList;
 
-            parkingSlotDao.start(parkingSlotFile);
+            parkingSlotDao.start(dirName + parkingSlotFile);
 //            Map<String, ParkingSlot> tempParkingSlotList = FileIO.readObject(parkingSlotFile);
 //            if (tempParkingSlotList != null)
 //                parkingSlotList = tempParkingSlotList;
 
-            scanningsDao.start(scanningFile);
+            scanningsDao.start(dirName + scanningFile);
 //            List<Scannings> tempScanningList = FileIO.readObject(scanningFile);
 //            if (tempScanningList != null)
 //                scanningList = tempScanningList;
