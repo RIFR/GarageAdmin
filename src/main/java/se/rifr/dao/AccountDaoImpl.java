@@ -15,13 +15,15 @@ public class AccountDaoImpl implements AccountDao{
     @Override
     public void maintain(Account account) {
         accounts.put(account.getKey(),account);
-        FileIO.writeObject(accounts, fileName);
+        if (fileName != null)
+            FileIO.writeObject(accounts, fileName);
     }
 
     @Override
     public void delete(Account account) {
-        accounts.remove(account);
-        FileIO.writeObject(accounts, fileName);
+        boolean ok = accounts.remove(account.getKey(),account);
+        if (ok && fileName != null)
+            FileIO.writeObject(accounts, fileName);
     }
 
 
@@ -68,7 +70,10 @@ public class AccountDaoImpl implements AccountDao{
 
     @Override
     public void stop(){
-        if (accounts != null) FileIO.writeObject(accounts, fileName);
-    };
+        if (accounts != null && fileName != null) {
+            FileIO.writeObject(accounts, fileName);
+            fileName = null;
+        }
+    }
 
 }

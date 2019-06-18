@@ -15,13 +15,15 @@ public class UserDaoImpl implements UserDao{
     @Override
     public void maintain(User User) {
         users.put(User.getKey(),User);
-        FileIO.writeObject(users, fileName);
+        if (fileName != null)
+            FileIO.writeObject(users, fileName);
     }
 
     @Override
     public void delete(User User) {
-        users.remove(User);
-        FileIO.writeObject(users, fileName);
+        boolean ok = users.remove(User.getKey(),User);
+        if (ok && fileName != null)
+            FileIO.writeObject(users, fileName);
     }
 
     @Override
@@ -68,7 +70,10 @@ public class UserDaoImpl implements UserDao{
 
     @Override
     public void stop(){
-        if (users != null) FileIO.writeObject(users, fileName);
-    };
+        if (users != null && fileName != null) {
+            FileIO.writeObject(users, fileName);
+            fileName = null;
+        }
+    }
 
 }

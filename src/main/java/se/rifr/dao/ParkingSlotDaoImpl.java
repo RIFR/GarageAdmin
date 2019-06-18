@@ -10,45 +10,47 @@ public class ParkingSlotDaoImpl implements ParkingSlotDao{
 
     String fileName;
 
-    private Map<String,ParkingSlot> ParkingSlots = new HashMap<>();
+    private Map<String,ParkingSlot> parkingSlots = new HashMap<>();
 
     @Override
     public void maintain(ParkingSlot ParkingSlot) {
-        ParkingSlots.put(ParkingSlot.getKey(),ParkingSlot);
-        FileIO.writeObject(ParkingSlots, fileName);
+        parkingSlots.put(ParkingSlot.getKey(),ParkingSlot);
+        if (fileName != null)
+            FileIO.writeObject(parkingSlots, fileName);
     }
 
     @Override
     public void delete(ParkingSlot ParkingSlot) {
-        ParkingSlots.remove(ParkingSlot);
-        FileIO.writeObject(ParkingSlots, fileName);
+        boolean ok = parkingSlots.remove(ParkingSlot.getKey(),ParkingSlot);
+        if (ok && fileName != null)
+            FileIO.writeObject(parkingSlots, fileName);
     }
 
     @Override
     public Optional<ParkingSlot> read(String key) {
-        return Optional.ofNullable(ParkingSlots.get(key));
+        return Optional.ofNullable(parkingSlots.get(key));
     }
 
     @Override
     public Collection<ParkingSlot> readAllParkingSlots() {
-        return  ParkingSlots.values().stream().collect(Collectors.toSet());
+        return  parkingSlots.values().stream().collect(Collectors.toSet());
     }
 
     @Override
     public Collection<ParkingSlot> readAllFreeParkingSlots() {
-        return  ParkingSlots.values().stream().filter(item -> item.isFree()).collect(Collectors.toSet());
+        return  parkingSlots.values().stream().filter(item -> item.isFree()).collect(Collectors.toSet());
     }
 
     @Override
     public Collection<ParkingSlot> readParkingSlots(String inGarage) {
-        return  ParkingSlots.values().stream()
+        return  parkingSlots.values().stream()
                 .filter(item -> item.getGarage().getName().equals(inGarage))
                 .collect(Collectors.toSet());
     }
 
     @Override
     public Collection<ParkingSlot> readFreeParkingSlots(String inGarage) {
-        return  ParkingSlots.values().stream()
+        return  parkingSlots.values().stream()
                 .filter(item -> item.getGarage().getName().equals(inGarage))
                 .filter(item -> item.isFree())
                 .collect(Collectors.toSet());
@@ -76,12 +78,15 @@ public class ParkingSlotDaoImpl implements ParkingSlotDao{
 
         Map<String, ParkingSlot> tempList = FileIO.readObject(fileName);
         if (tempList != null)
-            ParkingSlots = tempList;
+            parkingSlots = tempList;
     };
 
     @Override
     public void stop(){
-        if (ParkingSlots != null) FileIO.writeObject(ParkingSlots, fileName);
-    };
+        if (parkingSlots != null && fileName != null) {
+            FileIO.writeObject(parkingSlots, fileName);
+            fileName = null;
+        }
+    }
 
 }

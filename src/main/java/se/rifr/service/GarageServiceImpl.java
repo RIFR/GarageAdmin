@@ -1,13 +1,6 @@
 package se.rifr.service;
-
-import org.omg.CORBA.Environment;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import se.rifr.domain.*;
 import se.rifr.domain.vehicles.*;
 import se.rifr.dao.*;
@@ -16,7 +9,12 @@ import se.rifr.support.StdIO;
 import java.time.LocalDateTime;
 import java.util.*;
 
+//@Configuration
+//@ConfigurationProperties(prefix = "GarageServiceImpl")
+//@PropertySource("classpath:application.properties")
 public class GarageServiceImpl implements GarageService {
+
+    //public static enum Daos {USER,CUSTOMER,ACCOUNT,VEHICLE,GARAGE,PARKINGSLOT,SCANNINGS};
 
     //Pointers to interface Implementations (if set)
     private final UserDao        userDao;
@@ -29,22 +27,26 @@ public class GarageServiceImpl implements GarageService {
 
     // Default directories for the Serializable stored data
     private String defaultDirNameUnix    = "/var/opt/GarageAdminStorage/";
-    private String defaultDirNameWindows = "C:\\Dev\\GarageServiceImpl\\";
+    private String defaultDirNameWindows = "C:\\Dev\\GarageAdminStorage\\";
 
+    //@Value("string value")
     //@Value("${storageDirectory}")
+    //private Path directory = FileSystems.getDefault().getPath("GarageAdminStorage");
+
     private String dirName;
 
     public GarageServiceImpl() {
 
-        //System.getProperties().list(System.out);
+         //System.getProperties().list(System.out);
 
         String OS = System.getProperty("os.name").toLowerCase();
 
         //System.out.println(dirName);
-        if (OS.indexOf("win") >= 0)
+        if (OS.indexOf("win") >= 0) {
             this.dirName = defaultDirNameWindows;
-        else
+        }else{
             this.dirName = defaultDirNameUnix;
+        }
 
         ApplicationContext  applicationContext = new GenericXmlApplicationContext("applicationContext.xml");
 

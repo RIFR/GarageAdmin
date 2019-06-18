@@ -15,13 +15,15 @@ public class CustomerDaoImpl implements CustomerDao{
     @Override
     public void maintain(Customer customer) {
         customers.put(customer.getKey(),customer);
-        FileIO.writeObject(customers, fileName);
+        if (fileName != null)
+            FileIO.writeObject(customers, fileName);
     }
 
     @Override
     public void delete(Customer customer) {
-        customers.remove(customer);
-        FileIO.writeObject(customers, fileName);
+        boolean ok = customers.remove(customer.getKey(),customer);
+        if (ok && fileName != null)
+            FileIO.writeObject(customers, fileName);
     }
 
     @Override
@@ -61,7 +63,10 @@ public class CustomerDaoImpl implements CustomerDao{
 
     @Override
     public void stop(){
-        if (customers != null) FileIO.writeObject(customers, fileName);
-    };
+        if (customers != null && fileName!=null){
+            FileIO.writeObject(customers, fileName);
+            fileName = null;
+        }
+    }
 
 }

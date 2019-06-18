@@ -10,28 +10,30 @@ public class VehicleDaoImpl implements VehicleDao{
 
     String fileName;
 
-    private Map<String,Vehicle> Vehicles = new HashMap<>();
+    private Map<String,Vehicle> vehicles = new HashMap<>();
 
     @Override
     public void maintain(Vehicle Vehicle) {
-        Vehicles.put(Vehicle.getKey(),Vehicle);
-        FileIO.writeObject(Vehicles, fileName);
+        vehicles.put(Vehicle.getKey(),Vehicle);
+        if (fileName != null)
+            FileIO.writeObject(vehicles, fileName);
     }
 
     @Override
     public void delete(Vehicle Vehicle) {
-        Vehicles.remove(Vehicle);
-        FileIO.writeObject(Vehicles, fileName);
+        boolean ok = vehicles.remove(Vehicle.getKey(),Vehicle);
+        if (ok && fileName != null)
+            FileIO.writeObject(vehicles, fileName);
     }
 
     @Override
     public Optional<Vehicle> read(String key) {
-        return Optional.ofNullable(Vehicles.get(key));
+        return Optional.ofNullable(vehicles.get(key));
     }
 
     @Override
     public Collection<Vehicle> readAllVehicles() {
-        return Vehicles.values().stream().collect(Collectors.toSet());
+        return vehicles.values().stream().collect(Collectors.toSet());
     }
 
     @Override
@@ -57,12 +59,15 @@ public class VehicleDaoImpl implements VehicleDao{
 
         Map<String, Vehicle> tempList = FileIO.readObject(fileName);
         if (tempList != null)
-            Vehicles = tempList;
+            vehicles = tempList;
     };
 
     @Override
     public void stop(){
-        if (Vehicles != null) FileIO.writeObject(Vehicles, fileName);
-    };
+        if (vehicles != null && fileName != null) {
+            FileIO.writeObject(vehicles, fileName);
+            fileName = null;
+        }
+    }
 
 }

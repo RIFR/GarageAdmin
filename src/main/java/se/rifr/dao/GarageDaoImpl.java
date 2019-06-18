@@ -10,28 +10,30 @@ public class GarageDaoImpl implements GarageDao{
 
     String fileName;
 
-    private Map<String,Garage> Garages = new HashMap<>();
+    private Map<String,Garage> garages = new HashMap<>();
 
     @Override
     public void maintain(Garage garage) {
-        Garages.put(garage.getKey(),garage);
-        FileIO.writeObject(Garages, fileName);
+        garages.put(garage.getKey(),garage);
+        if (fileName != null)
+        FileIO.writeObject(garages, fileName);
     }
 
     @Override
     public void delete(Garage garage) {
-        Garages.remove(garage);
-        FileIO.writeObject(Garages, fileName);
+        boolean ok = garages.remove(garage.getKey(),garage);
+        if (ok && fileName != null)
+            FileIO.writeObject(garages, fileName);
     }
 
     @Override
     public Optional<Garage> read(String key) {
-        return Optional.ofNullable(Garages.get(key));
+        return Optional.ofNullable(garages.get(key));
     }
 
     @Override
     public Collection<Garage> readAllGarages() {
-        return Garages.values().stream().collect(Collectors.toSet());
+        return garages.values().stream().collect(Collectors.toSet());
     }
 
     @Override
@@ -54,12 +56,15 @@ public class GarageDaoImpl implements GarageDao{
 
         Map<String, Garage> tempList = FileIO.readObject(fileName);
         if (tempList != null)
-            Garages = tempList;
+            garages = tempList;
     };
 
     @Override
     public void stop(){
-        if (Garages != null) FileIO.writeObject(Garages, fileName);
-    };
+        if (garages != null && fileName != null) {
+            FileIO.writeObject(garages, fileName);
+            fileName = null;
+        }
+    }
 
 }

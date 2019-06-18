@@ -15,7 +15,8 @@ public class ScanningsDaoImpl implements ScanningsDao{
     @Override
     public void add(Scannings Scanning) {
         scannings.add(Scanning);
-        FileIO.writeObject(scannings, fileName);
+        if (fileName != null)
+            FileIO.writeObject(scannings, fileName);
     }
 
     @Override
@@ -64,7 +65,10 @@ public class ScanningsDaoImpl implements ScanningsDao{
 
     @Override
     public void stop(){
-        if (scannings != null) FileIO.writeObject(scannings, fileName);
-    };
+        if (scannings != null && fileName != null) {
+            FileIO.writeObject(scannings, fileName);
+            fileName = null;
+        }
+    }
 
 }
