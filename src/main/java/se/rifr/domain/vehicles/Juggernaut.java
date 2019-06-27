@@ -15,7 +15,7 @@ class Juggernaut extends Vehicle {
         super(builder);
         this.noOfBeds = builder.noOfBeds;
     }
-    public static class Builder extends Vehicle.Builder <Juggernaut.Builder>{
+    public static class Builder extends Vehicle.Builder <Juggernaut.Builder> {
 
         private int noOfBeds;
 

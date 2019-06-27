@@ -8,7 +8,7 @@
             http://www.springframework.org/schema/context
             http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean
+    <!--bean
             class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
@@ -20,7 +20,7 @@
 
     <context:annotation-config/>
     <context:component-scan base-package="se.rifr"/>
-    <context:property-placeholder location="classpath:application.properties" />
+    <context:property-placeholder location="classpath:application.properties" /!-->
 
 
     <bean id = "accountDao" class = "se.rifr.dao.AccountDaoImpl"> </bean>

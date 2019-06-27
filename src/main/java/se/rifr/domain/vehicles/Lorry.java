@@ -8,7 +8,7 @@ public class Lorry extends Vehicle {
         super(builder);
     }
 
-    public static class Builder extends Vehicle.Builder  <Lorry.Builder> {
+    public static class Builder extends Vehicle.Builder <Lorry.Builder> {
         public Lorry build(){
             return new Lorry(this);
         }

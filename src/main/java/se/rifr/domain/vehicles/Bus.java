@@ -16,7 +16,7 @@ public class Bus extends Vehicle {
         super(builder);
         this.noOfSeats = builder.noOfSeats;
     }
-    public static class Builder extends Vehicle.Builder  <Bus.Builder>{
+    public static class Builder extends Vehicle.Builder <Bus.Builder> {
 
         private int noOfSeats;
 
