@@ -23,12 +23,12 @@
     <context:property-placeholder location="classpath:application.properties" /!-->
 
 
-    <bean id = "accountDao" class = "se.rifr.dao.AccountDaoImpl"> </bean>
-    <bean id = "customerDao" class = "se.rifr.dao.CustomerDaoImpl"> </bean>
-    <bean id = "garageDao" class = "se.rifr.dao.GarageDaoImpl"> </bean>
-    <bean id = "parkingSlotDao" class = "se.rifr.dao.ParkingSlotDaoImpl"> </bean>
-    <bean id = "userDao" class = "se.rifr.dao.UserDaoImpl"> </bean>
-    <bean id = "vehicleDao" class = "se.rifr.dao.VehicleDaoImpl"> </bean>
-    <bean id = "scanningsDao" class = "se.rifr.dao.ScanningsDaoImpl"> </bean>
+    <bean barcode = "accountDao" class = "se.rifr.daoimpl.AccountDaoImpl"> </bean>
+    <bean barcode = "customerDao" class = "se.rifr.daoimpl.CustomerDaoImpl"> </bean>
+    <bean barcode = "garageDao" class = "se.rifr.daoimpl.GarageDaoImpl"> </bean>
+    <bean barcode = "parkingSlotDao" class = "se.rifr.daoimpl.ParkingSlotDaoImpl"> </bean>
+    <bean barcode = "userDao" class = "se.rifr.daoimpl.UserDaoImpl"> </bean>
+    <bean barcode = "vehicleDao" class = "se.rifr.daoimpl.VehicleDaoImpl"> </bean>
+    <bean barcode = "scanningsDao" class = "se.rifr.daoimpl.ScanningsDaoImpl"> </bean>
 
 </beans>

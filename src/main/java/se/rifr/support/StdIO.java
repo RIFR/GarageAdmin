@@ -1,5 +1,6 @@
 package se.rifr.support;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,6 +27,8 @@ public class StdIO
     public static void ErrorReport (String str) {
 
         System.out.println(ConsoleColors.RED + "ERROR: " + str + ConsoleColors.RESET);
+
+        JOptionPane.showMessageDialog(null, "ERROR: "+ str );
 
     }
 

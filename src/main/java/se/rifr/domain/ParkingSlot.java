@@ -3,19 +3,41 @@ package se.rifr.domain;
 import se.rifr.support.StdIO;
 import se.rifr.support.Str;
 
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Table;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+//@Entity
+//@Table(name = "ParkingSlots")
 public class ParkingSlot implements  Comparable<ParkingSlot>, java.io.Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+//    @Column(name = "garage",nullable = false)
     private Garage garage;
+
+//    @Column(name = "floor",nullable = false)
     private Floor floor;
-    private int           placeNo;
+
+//    @Column(name = "placeNo",nullable = false)
+    private int placeNo;
+
+//    @Column(name = "size",nullable = false)
     private Vehicle.Size size;      // size of the slot
-    private double        feePerHour = 0.0d;
-    private double        feePerMonth = 0.0d;
-    private Vehicle       parked = null;
+
+//    @Column(name = "feePerHour")
+    private double feePerHour = 0.0d;
+
+//    @Column(name = "feePerMonth")
+    private double feePerMonth = 0.0d;
+
+//    @Column(name = "parked")
+    private Vehicle parked = null;
+
+//    @Column(name = "timeParked")
     private LocalDateTime timeParked;
 
     public ParkingSlot(ParkingSlot.Builder builder) {

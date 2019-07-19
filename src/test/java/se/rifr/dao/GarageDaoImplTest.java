@@ -1,6 +1,7 @@
 package se.rifr.dao;
 
 import org.junit.Test;
+import se.rifr.daoimpl.GarageDaoImpl;
 import se.rifr.domain.Garage;
 
 import java.util.Optional;

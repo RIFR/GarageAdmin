@@ -1,6 +1,7 @@
 package se.rifr.dao;
 
 import org.junit.Test;
+import se.rifr.daoimpl.CustomerDaoImpl;
 import se.rifr.domain.Customer;
 
 import java.util.Optional;

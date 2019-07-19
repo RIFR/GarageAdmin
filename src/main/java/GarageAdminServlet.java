@@ -1,4 +1,4 @@
-import se.rifr.service.GarageServiceImpl;
+import se.rifr.serviceimpl.GarageServiceImpl;
 import se.rifr.service.GarageService;
 
 import javax.servlet.http.HttpServlet;

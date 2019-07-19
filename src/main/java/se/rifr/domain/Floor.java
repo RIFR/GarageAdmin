@@ -1,6 +1,8 @@
 package se.rifr.domain;
 public class Floor implements java.io.Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private int    level;
     private String Description;
 

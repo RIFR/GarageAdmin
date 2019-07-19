@@ -3,13 +3,27 @@ package se.rifr.domain;
 import se.rifr.support.StdIO;
 import se.rifr.support.Str;
 
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
+//import javax.persistence.Table;
+import java.util.Objects;
+
+//@Entity
+//@Table(name = "Garages")
 public class Garage implements java.io.Serializable{
 
+    private static final long serialVersionUID = 1L;
+
+//    @Id
+//    @Column(name = "name",unique = true,nullable = false)
     private String name;
+
+//    @Column(name = "description")
     private String description;
 
     public Garage(String name, String description) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
         this.description = description;
     }
 

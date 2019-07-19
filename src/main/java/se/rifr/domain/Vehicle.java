@@ -3,19 +3,43 @@ package se.rifr.domain;
 import se.rifr.support.StdIO;
 import se.rifr.support.Str;
 
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
+//import javax.persistence.Table;
 import java.util.Objects;
 
+//@Entity
+//@Table(name = "Vehicles")
 public abstract class Vehicle implements java.io.Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static enum Size {SMALL,MEDIUM,LARGE,HUGE};
 
-    private String   barcode;
-    private String   model;
-    private String   colour;
-    private int      noOfWheels;
-    private int      noiseLevel; // 0-9, 9 highest
-    private String   fuel;
-    private Size     size;
+//    @Id
+//    @Column(name = "barcode",unique = true,nullable = false)
+    private String barcode;
+
+//    @Column(name = "model")
+    private String model;
+
+//    @Column(name = "colour")
+    private String colour;
+
+//    @Column(name = "noOfWheels")
+    private int noOfWheels;
+
+//    @Column(name = "noiseLevel")
+    private int noiseLevel; // 0-9, 9 highest
+
+//    @Column(name = "fuel")
+    private String fuel;
+
+//    @Column(name = "size")
+    private Size size;
+
+//    @Column(name = "customer",nullable = false)
     private Customer customer;
 
     public Vehicle(Builder builder) {
@@ -30,30 +54,6 @@ public abstract class Vehicle implements java.io.Serializable {
         this.size       = builder.size;
 
     }
-
-//    public Vehicle(String barcode,String model, String colour, Customer customer) {
-//
-//        this.barcode    = barcode;
-//        this.customer   = customer;
-//        this.model      = model;
-//        this.colour     = colour;
-//
-//        this.noOfWheels = 4;
-//        this.noiseLevel = 5;
-//        this.fuel       = "PETROL";
-//        this.size       = Size.MEDIUM;
-//    }
-//    public Vehicle(String barcode, String model, String colour, int noOfWheels, int noiseLevel, String fuel, Size size, Customer customer) {
-//
-//        this.barcode = barcode;
-//        this.model = model;
-//        this.colour = colour;
-//        this.noOfWheels = noOfWheels;
-//        this.noiseLevel = noiseLevel;
-//        this.fuel = fuel;
-//        this.size = size;
-//        this.customer = customer;
-//    }
 
     public String getKey() { return barcode; }
 

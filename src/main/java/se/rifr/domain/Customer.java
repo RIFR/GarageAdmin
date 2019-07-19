@@ -3,15 +3,35 @@ package se.rifr.domain;
 import se.rifr.support.StdIO;
 import se.rifr.support.Str;
 
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
+//import javax.persistence.Table;
 import java.util.Objects;
 
+//@Entity
+//@Table(name = "Customers")
 public class Customer implements java.io.Serializable{
 
+    private static final long serialVersionUID = 1L;
+
+//    @Column(name = "firstName",nullable = false)
     private String firstName;
+
+//    @Column(name = "lastName",nullable = false)
     private String lastName;
+
+//    @Id
+//    @Column(name = "barCode",unique = true,nullable = false)
     private String barCode;
+
+//    @Column(name = "email")
     private String email;
+
+//    @Column(name = "telephoneNumber")
     private String telephoneNumber;
+
+//    @Column(name = "userName")
     private String userName;
 
     public Customer(Customer.Builder builder) {

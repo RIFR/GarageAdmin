@@ -1,6 +1,7 @@
 package se.rifr.dao;
 
 import org.junit.Test;
+import se.rifr.daoimpl.VehicleDaoImpl;
 import se.rifr.domain.Customer;
 import se.rifr.domain.Vehicle;
 import se.rifr.domain.vehicles.*;

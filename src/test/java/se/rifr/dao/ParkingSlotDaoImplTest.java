@@ -1,6 +1,7 @@
 package se.rifr.dao;
 
 import org.junit.Test;
+import se.rifr.daoimpl.ParkingSlotDaoImpl;
 import se.rifr.domain.*;
 import se.rifr.domain.vehicles.Car;
 import se.rifr.domain.vehicles.Mc;

@@ -3,16 +3,39 @@ package se.rifr.domain;
 import se.rifr.support.StdIO;
 import se.rifr.support.Str;
 
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
+//import javax.persistence.Table;
 import java.util.Objects;
+import com.so4it.common.util.object.ValueObject;
 
-public class Account implements java.io.Serializable{
+//@Entity
+//@Table(name = "Accounts")
+public class Account extends ValueObject implements java.io.Serializable{
 
+    private static final long serialVersionUID = 1L;
+
+//    @Id
+//    @Column(name = "customer",unique = true,nullable = false)
     private Customer customer;
+
+//    @Column(name = "bankid",nullable = false)
     private String bankId;
+
+//    @Column(name = "saldo",nullable = false)
     private double saldo;
+
+//    @Column(name = "description",nullable = false)
     private String description;
+
+//    @Column(name = "parkedTime",nullable = false)
     private long   parkedTime; // minutes since last payment
 
+    @Override
+    protected Object[] getIdFields() {
+        return new Object[]{customer,bankId,saldo,description};
+    }
 
     public Account(Account.Builder builder) {
 
@@ -21,7 +44,6 @@ public class Account implements java.io.Serializable{
         this.saldo       = builder.saldo;
         this.description = builder.description;
         this.parkedTime  = 0;
-
     }
 
     public String getKey() { return customer.getBarCode(); }

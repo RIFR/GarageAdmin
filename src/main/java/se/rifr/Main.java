@@ -1,9 +1,7 @@
 package se.rifr;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import se.rifr.service.GarageService;
-import se.rifr.service.GarageServiceImpl;
+import se.rifr.serviceimpl.GarageServiceImpl;
 
 //@SpringBootApplication
 public class Main {

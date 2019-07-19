@@ -1,6 +1,7 @@
 package se.rifr.dao;
 
 import org.junit.Test;
+import se.rifr.daoimpl.ScanningsDaoImpl;
 import se.rifr.domain.Customer;
 import se.rifr.domain.Garage;
 import se.rifr.domain.Scannings;
@@ -8,8 +9,6 @@ import se.rifr.domain.Vehicle;
 import se.rifr.domain.vehicles.Mc;
 
 import java.time.LocalDateTime;
-
-import java.util.Optional;
 
 import static org.junit.Assert.*;
 

@@ -3,20 +3,36 @@ package se.rifr.domain;
 import se.rifr.support.StdIO;
 import se.rifr.support.Str;
 
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
+//import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
+//@Entity
+//@Table(name = "Scannings")
 public class Scannings implements java.io.Serializable{
 
+    private static final long serialVersionUID = 1L;
+
+//    @Column(name = "vehicle",nullable = false)
     private Vehicle vehicle;
+
+//    @Column(name = "time",nullable = false)
     private LocalDateTime time;
+
+//    @Column(name = "entered",nullable = false)
     private boolean entered;  // Enter or leaving
+
+//    @Column(name = "garage",nullable = false)
     private Garage garage;
 
     public Scannings(Vehicle vehicle, LocalDateTime time, boolean entered, Garage garage) {
-        this.vehicle = vehicle;
-        this.time = time;
-        this.entered = entered;
-        this.garage = garage;
+        this.vehicle = Objects.requireNonNull(vehicle);
+        this.time = Objects.requireNonNull(time);
+        this.entered = Objects.requireNonNull(entered);
+        this.garage = Objects.requireNonNull(garage);
     }
 
     public Vehicle getVehicle() {
