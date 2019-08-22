@@ -2,17 +2,12 @@ package se.rifr.domain;
 
 import se.rifr.support.StdIO;
 import se.rifr.support.Str;
-
-//import javax.persistence.Column;
-//import javax.persistence.Entity;
-//import javax.persistence.Id;
-//import javax.persistence.Table;
 import java.util.Objects;
-import com.so4it.common.util.object.ValueObject;
+
 
 //@Entity
 //@Table(name = "Accounts")
-public class Account extends ValueObject implements java.io.Serializable{
+public class Account implements java.io.Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -31,11 +26,6 @@ public class Account extends ValueObject implements java.io.Serializable{
 
 //    @Column(name = "parkedTime",nullable = false)
     private long   parkedTime; // minutes since last payment
-
-    @Override
-    protected Object[] getIdFields() {
-        return new Object[]{customer,bankId,saldo,description};
-    }
 
     public Account(Account.Builder builder) {
 
